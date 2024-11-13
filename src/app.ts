@@ -9,14 +9,6 @@ dotenv.config();
 
 const app: Express = express();
 
-// Port configuration
-const port = process.env.PORT || 8000;
-
-//connect DB
-const connectDB = require("./db/connect");
-
-// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
 // Middleware setup
 app.use(cors());
 app.use(express.json());
