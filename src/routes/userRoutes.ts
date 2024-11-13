@@ -35,6 +35,8 @@ const router: Router = express.Router();
  *       409: { description: Conflict, user already exists }
  */
 
+/** */
+
 router.post("/register", register);
 router.post("/login", login);
 
