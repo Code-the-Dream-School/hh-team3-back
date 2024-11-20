@@ -5,13 +5,13 @@ const root = process.env.PROFILE_PICTURE_ROOT;
 
 const userSchema = new Schema(
   {
-    name: {
+    firstName: {
       type: String,
       required: [true, 'Please provide the name'],
       minLength: 3,
       maxLength: 30,
     },
-    lastname: {
+    lastName: {
       type: String,
       required: [true, 'Please provide the last name'],
       minLength: 3,
@@ -58,8 +58,8 @@ userSchema.pre('save', async function (next) {
 })
 
 export interface IUser extends Document {
-  name: string;
-  lastname: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   photo?: string;
