@@ -1,4 +1,3 @@
-import swaggerJSDoc from "swagger-jsdoc";
 import app from "./app";
 import swaggerDocs from "./utils/swagger";
 import connectDB from "./db/connect";
@@ -11,7 +10,7 @@ const start = async () => {
     if (!process.env.MONGO_URI) {
       throw new Error("MONGO_URI is not defined in the environment variables");
     }
-    //await connectDB(process.env.MONGO_URI);
+    await connectDB(process.env.MONGO_URI);
 
     app.listen(port, () => {
       console.log(`Server is listening on port ${port}!`);
