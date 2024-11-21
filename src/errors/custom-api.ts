@@ -1,8 +1,11 @@
 class CustomAPIError extends Error {
-  constructor(message: string) {
+  statusCode: number;
+
+  constructor(message: string, statusCode: number = 500) {
     super(message);
-    this.name = this.constructor.name; 
-    Object.setPrototypeOf(this, CustomAPIError.prototype); 
+    this.statusCode = statusCode;
+
+    Object.setPrototypeOf(this, CustomAPIError.prototype);
   }
 }
 

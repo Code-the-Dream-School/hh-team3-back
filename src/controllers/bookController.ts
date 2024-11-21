@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import Book, { IBook } from "../models/Book";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError, NotFoundError } from "../errors";
+import mongoose from "mongoose";
 
 // Interface for query parameters
 interface IGetBooksQuery {
@@ -13,18 +14,19 @@ interface IGetBooksQuery {
 // Get all books
 const getAllBooks = async (
   req: Request<{}, {}, {}, IGetBooksQuery>,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   const { search, categories, sort } = req.query;
   let query: any = {};
 
   // Filter by categories
   if (categories) {
-     const categoryArray = Array.isArray(categories)
-       ? categories
-       : categories.split(",");
+    const categoryArray = Array.isArray(categories)
+      ? categories
+      : categories.split(",");
 
-     query.categories = { $in: categoryArray };
+    query.categories = { $in: categoryArray };
   }
 
   // Search by title
@@ -41,49 +43,38 @@ const getAllBooks = async (
       else if (sort === "latest") sortOptions.publishedDate = -1;
       else if (sort === "oldest") sortOptions.publishedDate = 1;
     } else {
-      sortOptions.publishedDate = -1; // Default to sorting by latest published date
+      sortOptions.publishedDate = -1; 
     }
 
     const books = await Book.find(query).sort(sortOptions);
     res.status(StatusCodes.OK).json({ books, count: books.length });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
-    } else {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: "An unexpected error occurred" });
-    }
+    return next(error);
   }
 };
 
 // Get a single book by ID
-const getBook = async (req: Request<{ bookId: string }>, res: Response) => {
+const getBook = async (
+  req: Request<{ bookId: string }>,
+  res: Response,
+  next: NextFunction
+) => {
   const { bookId } = req.params;
 
   try {
+     
     const book = await Book.findById(bookId);
     if (!book) {
-      throw new NotFoundError(`No book with id ${bookId}`);
+      return next(new NotFoundError(`No book with id ${bookId}`));
     }
     res.status(StatusCodes.OK).json({ book });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
-    } else {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: "An unexpected error occurred" });
-    }
+    return next(error);
   }
 };
 
 // Create a new book
-const createBook = async (req: Request<{}, {}, IBook>, res: Response) => {
+const createBook = async (req: Request<{}, {}, IBook>, res: Response, next: NextFunction) => {
   const {
     title,
     authors,
@@ -103,27 +94,24 @@ const createBook = async (req: Request<{}, {}, IBook>, res: Response) => {
     !categories ||
     !imageLinks
   ) {
-    throw new BadRequestError("All fields are required");
+     return next(new BadRequestError("All fields are required"));
   }
 
   try {
     const book = await Book.create(req.body);
-    res.status(StatusCodes.CREATED).json({ book });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
-    } else {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: "An unexpected error occurred" });
-    }
+    res.status(201).json({ book });
+  } catch (error) {
+    return next(error); 
   }
+
 };
 
 // Delete a book by ID
-const deleteBook = async (req: Request<{ bookId: string }>, res: Response) => {
+const deleteBook = async (
+  req: Request<{ bookId: string }>,
+  res: Response,
+  next: NextFunction
+) => {
   const { bookId } = req.params;
 
   try {
@@ -133,15 +121,7 @@ const deleteBook = async (req: Request<{ bookId: string }>, res: Response) => {
     }
     res.status(StatusCodes.OK).send();
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
-    } else {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: "An unexpected error occurred" });
-    }
+    return next(error);
   }
 };
 
