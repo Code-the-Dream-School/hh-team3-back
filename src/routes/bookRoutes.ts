@@ -1,7 +1,13 @@
-// Get all books
+import { Router } from "express";
+import {
+  getAllBooks,
+  getBook,
+  createBook,
+  deleteBook,
+} from "../controllers/bookController";
 
-import { createBook, deleteBook, getAllBooks, getBook } from "../controllers/bookController";
-import router from "./mainRouter";
+// Create a router instance
+const router = Router();
 
 /**
  * @swagger
