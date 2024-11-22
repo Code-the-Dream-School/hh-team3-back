@@ -11,6 +11,72 @@ const router = Router();
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     Book:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: "60b4bca4f1c64f16d1c1c8e4"
+ *         title:
+ *           type: string
+ *           example: "The Great Gatsby"
+ *         authors:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: ["F. Scott Fitzgerald"]
+ *         publisher:
+ *           type: string
+ *           example: "Charles Scribner's Sons"
+ *         description:
+ *           type: string
+ *           example: "A novel about the American Dream"
+ *         publishedDate:
+ *           type: string
+ *           format: date
+ *           example: "1925-04-10"
+ *         categories:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: ["Fiction"]
+ *         imageLinks:
+ *           type: object
+ *           properties:
+ *             smallThumbnail:
+ *               type: string
+ *               example: "https://link-to-image"
+ *             thumbnail:
+ *               type: string
+ *               example: "https://link-to-thumbnail"
+ *   responses:
+ *     BookResponse:
+ *       description: A book object
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Book'
+ *     BookListResponse:
+ *       description: A list of books
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               books:
+ *                 type: array
+ *                 items:
+ *                   $ref: '#/components/schemas/Book'
+ *               count:
+ *                 type: integer
+ *                 example: 100
+ */
+
+// Get all books
+/**
+ * @swagger
  * /api/v1/books:
  *   get:
  *     summary: Get all books
@@ -37,30 +103,7 @@ const router = Router();
  *         description: Sort the books by title (a-z, z-a) or by published date (latest, oldest)
  *     responses:
  *       200:
- *         description: A list of all books
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 books:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id: { type: string, example: "60b4bca4f1c64f16d1c1c8e4" }
- *                       title: { type: string, example: "The Great Gatsby" }
- *                       authors: { type: array, items: { type: string }, example: ["F. Scott Fitzgerald"] }
- *                       publisher: { type: string, example: "Charles Scribner's Sons" }
- *                       description: { type: string, example: "A novel about the American Dream" }
- *                       publishedDate: { type: string, format: date, example: "1925-04-10" }
- *                       categories: { type: array, items: { type: string }, example: ["Fiction"] }
- *                       imageLinks:
- *                         type: object
- *                         properties:
- *                           smallThumbnail: { type: string, example: "https://link-to-image" }
- *                           thumbnail: { type: string, example: "https://link-to-thumbnail" }
- *                 count: { type: integer, example: 100 }
+ *         $ref: '#/components/responses/BookListResponse'
  *       500:
  *         description: Internal server error
  */
@@ -78,19 +121,7 @@ router.get("/", getAllBooks);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               title: { type: string, example: "1984" }
- *               authors: { type: array, items: { type: string }, example: ["George Orwell"] }
- *               publisher: { type: string, example: "Secker & Warburg" }
- *               description: { type: string, example: "A dystopian novel" }
- *               publishedDate: { type: string, format: date, example: "1949-06-08" }
- *               categories: { type: array, items: { type: string }, example: ["Dystopian"] }
- *               imageLinks:
- *                 type: object
- *                 properties:
- *                   smallThumbnail: { type: string, example: "https://link-to-small-thumbnail" }
- *                   thumbnail: { type: string, example: "https://link-to-thumbnail" }
+ *             $ref: '#/components/schemas/Book'
  *     responses:
  *       201:
  *         description: Book created successfully
@@ -99,8 +130,12 @@ router.get("/", getAllBooks);
  *             schema:
  *               type: object
  *               properties:
- *                 message: { type: string, example: "Book created successfully" }
- *                 bookId: { type: string, example: "60b4bca4f1c64f16d1c1c8e4" }
+ *                 message:
+ *                   type: string
+ *                   example: "Book created successfully"
+ *                 bookId:
+ *                   type: string
+ *                   example: "60b4bca4f1c64f16d1c1c8e4"
  *       400:
  *         description: Bad request, invalid input data
  *       500:
@@ -124,24 +159,7 @@ router.post("/", createBook);
  *         description: The ID of the book to retrieve
  *     responses:
  *       200:
- *         description: A single book object
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id: { type: string, example: "60b4bca4f1c64f16d1c1c8e4" }
- *                 title: { type: string, example: "The Great Gatsby" }
- *                 authors: { type: array, items: { type: string }, example: ["F. Scott Fitzgerald"] }
- *                 publisher: { type: string, example: "Charles Scribner's Sons" }
- *                 description: { type: string, example: "A novel about the American Dream" }
- *                 publishedDate: { type: string, format: date, example: "1925-04-10" }
- *                 categories: { type: array, items: { type: string }, example: ["Fiction"] }
- *                 imageLinks:
- *                   type: object
- *                   properties:
- *                     smallThumbnail: { type: string, example: "https://link-to-image" }
- *                     thumbnail: { type: string, example: "https://link-to-thumbnail" }
+ *         $ref: '#/components/responses/BookResponse'
  *       404:
  *         description: Book not found
  *       500:
@@ -171,11 +189,14 @@ router.get("/:bookId", getBook);
  *             schema:
  *               type: object
  *               properties:
- *                 message: { type: string, example: "Book deleted successfully" }
+ *                 message:
+ *                   type: string
+ *                   example: "Book deleted successfully"
  *       404:
  *         description: Book not found
  *       500:
  *         description: Internal server error
  */
 router.delete("/:bookId", deleteBook);
+
 export default router;

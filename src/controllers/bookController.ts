@@ -61,9 +61,7 @@ const getBook = async (
   next: NextFunction
 ) => {
   const { bookId } = req.params;
-
-  try {
-     
+  try {    
     const book = await Book.findById(bookId);
     if (!book) {
       return next(new NotFoundError(`No book with id ${bookId}`));
