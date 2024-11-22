@@ -5,7 +5,6 @@ import logger from "morgan";
 import dotenv from "dotenv";
 import mainRouter from "./routes/mainRouter";
 import booksRouter from "./routes/bookRoutes";
-import { notFoundMiddleware } from "./middleware/not-found"; 
 import { errorHandlerMiddleware } from "./middleware/error-handler";
 import swaggerDocs from "./utils/swagger";
 
@@ -31,7 +30,10 @@ app.use("/api/v1", mainRouter);
 app.use("/api/v1/books", booksRouter); 
 
 
-app.use(notFoundMiddleware); 
+app.use((req: Request, res: Response) => {
+  res.status(404).send({ message: "Not Found" });
+});
+
 app.use(errorHandlerMiddleware); 
 
 

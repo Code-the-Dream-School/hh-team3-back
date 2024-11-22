@@ -34,18 +34,19 @@ const getAllBooks = async (
     query.title = { $regex: new RegExp(search, "i") }; // Case-insensitive search
   }
 
-  try {
-    // Sort options
-    const sortOptions: any = {};
-    if (sort) {
-      if (sort === "a-z") sortOptions.title = 1;
-      else if (sort === "z-a") sortOptions.title = -1;
-      else if (sort === "latest") sortOptions.publishedDate = -1;
-      else if (sort === "oldest") sortOptions.publishedDate = 1;
-    } else {
-      sortOptions.publishedDate = -1; 
-    }
 
+  // Sort options
+  const sortOptions: any = {};
+  if (sort) {
+    if (sort === "a-z") sortOptions.title = 1;
+    else if (sort === "z-a") sortOptions.title = -1;
+    else if (sort === "latest") sortOptions.publishedDate = -1;
+    else if (sort === "oldest") sortOptions.publishedDate = 1;
+  } else {
+    sortOptions.publishedDate = -1; 
+  }
+
+  try {
     const books = await Book.find(query).sort(sortOptions);
     res.status(StatusCodes.OK).json({ books, count: books.length });
   } catch (error: unknown) {

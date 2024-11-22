@@ -35,18 +35,18 @@ const bookSchema = new Schema(
     imageLinks: {
       smallThumbnail: {
         type: String,
-        required: true,
+        required: false,
       },
       thumbnail: {
         type: String,
-        required: true,
+        required: false,
       },
     },
   },
   {
     timestamps: true,
-    toJSON: { getters: true }, 
-    toObject: { getters: true }, 
+    toJSON: { getters: true },
+    toObject: { getters: true },
   }
 );
 

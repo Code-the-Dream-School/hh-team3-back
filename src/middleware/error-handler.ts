@@ -18,6 +18,8 @@ export const errorHandlerMiddleware = (
   res: Response,
   next: NextFunction
 ): void => {
+  const MONGO_DUPLICATE_KEY_ERROR_CODE = 11000;
+  
   let customError: CustomError = {
     statusCode: (err as any).statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
     msg:
@@ -41,8 +43,10 @@ export const errorHandlerMiddleware = (
     return;
   }
 
-  if (err instanceof mongoose.mongo.MongoError && err.code === 11000) {
-
+  if (
+    err instanceof mongoose.mongo.MongoError &&
+    err.code === MONGO_DUPLICATE_KEY_ERROR_CODE
+  ) {
     const mongoError = err as MongoErrorWithKeyValue;
     customError.statusCode = StatusCodes.BAD_REQUEST;
     customError.msg = `Duplicate field value entered for ${Object.keys(
