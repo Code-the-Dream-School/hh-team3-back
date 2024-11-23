@@ -10,12 +10,25 @@ import swaggerDocs from "./utils/swagger";
 
 dotenv.config();
 
+// Extra security packages
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const rateLimiter = require('express-rate-limit');
+
 const app: Express = express();
 
 const { SWAGGER_PORT } = process.env;
 const swaggerPort = Number(SWAGGER_PORT) || 8000;
 
 // Middleware setup
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+  })
+);
+app.use(helmet());
+app.use(xss());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
