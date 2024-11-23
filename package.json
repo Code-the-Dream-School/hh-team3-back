@@ -4,11 +4,9 @@
   "description": "Back-End Repo for Team 1 of Baboon/Bald Eagle Practicum",
   "main": "dist/app.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "serve": "node dist/server.js",
     "dev": "nodemon --exec ts-node src/server.ts --watch src",
-    "deploy": "npm run build && npm run start"     
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "author": "",
   "license": "ISC",
