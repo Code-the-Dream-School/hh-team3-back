@@ -22,6 +22,12 @@ const router = Router();
  *         title:
  *           type: string
  *           example: "The Great Gatsby"
+ *         googleID:
+ *           type: string
+ *           example: "xmnuDwAAQBAJ"
+ *         link:
+ *           type: string
+ *           example: "https://www.googleapis.com/books/v1/volumes/xmnuDwAAQBAJ"
  *         authors:
  *           type: array
  *           items:
