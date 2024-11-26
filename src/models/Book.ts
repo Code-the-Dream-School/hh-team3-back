@@ -11,6 +11,10 @@ const bookSchema = new Schema(
       type: String,
       required: false,
     },
+    link: {
+      type: String,
+      required: false,
+    },
     authors: {
       type: [String],
       required: true,
@@ -55,6 +59,7 @@ const Book = mongoose.model<IBook>("Book", bookSchema);
 export interface IBook extends Document {
   title: string;
   googleID: string;
+  link: string;
   authors: string[];
   publisher: string;
   description: string;
