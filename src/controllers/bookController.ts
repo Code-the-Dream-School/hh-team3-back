@@ -21,14 +21,22 @@ const getAllBooks = async (
   let query: any = {};
 
   // Filter by categories
-  if (categories) {
-    const categoryArray = Array.isArray(categories)
-      ? categories
-      : categories.split(",");
+   if (categories) {
+     const categoryArray = Array.isArray(categories)
+       ? categories
+       : categories.split(",");
 
-    query.categories = { $in: categoryArray };
-  }
-
+     query.categories = {
+       $in: categoryArray.map((category: string) => {
+         // Trim the category and extract the main category before the slash
+         const [mainCategory] = category
+           .split("/")
+           .map((part: string) => part.trim());
+         return new RegExp(`^${mainCategory}`);
+       }),
+     };
+   }
+   
   // Search by title
   if (search) {
     query.title = { $regex: new RegExp(search, "i") }; // Case-insensitive search
@@ -76,33 +84,53 @@ const getBook = async (
 const createBook = async (req: Request<{}, {}, IBook>, res: Response, next: NextFunction) => {
   const {
     title,
+    googleID,
     authors,
     publisher,
     description,
     publishedDate,
     categories,
-    imageLinks,
   } = req.body;
 
-  if (
-    !title ||
-    !authors ||
-    !publisher ||
-    !description ||
-    !publishedDate ||
-    !categories ||
-    !imageLinks
-  ) {
-     return next(new BadRequestError("All fields are required"));
+  if (!title) {
+    return next(new BadRequestError("Title is required"));
+  }
+  if (!authors) {
+    return next(new BadRequestError("Authors are required"));
+  }
+  if (!publisher) {
+    return next(new BadRequestError("Publisher is required"));
+  }
+  if (!description) {
+    return next(new BadRequestError("Description is required"));
+  }
+  if (!publishedDate) {
+    return next(new BadRequestError("Published Date is required"));
   }
 
+  // If googleID is provided, it should be unique
+  if (googleID) {
+    try {
+      const existingBook = await Book.findOne({ googleID });
+
+      if (existingBook) {
+        return next(new BadRequestError("A book with this googleID already exists"));
+      }
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  if (categories && categories.length === 0) {
+    return next(new BadRequestError("Categories cannot be an empty array"));
+  }
+ 
   try {
     const book = await Book.create(req.body);
     res.status(201).json({ book });
   } catch (error) {
-    return next(error); 
+    return next(error);
   }
-
 };
 
 // Delete a book by ID
