@@ -4,6 +4,7 @@ import {
   getBook,
   createBook,
   deleteBook,
+  getAllCategories,
 } from "../controllers/bookController";
 
 // Create a router instance
@@ -115,6 +116,39 @@ const router = Router();
  */
 router.get("/", getAllBooks);
 
+/**
+ * @swagger
+ * /api/v1/books/categories:
+ *   get:
+ *     summary: Get all categories
+ *     tags: [Categories]
+ *     description: Fetch a list of unique categories from all books, where each category is the first part of the category string before any "/".
+ *     responses:
+ *       200:
+ *         description: A list of unique categories
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 categories:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: List of unique categories (first part before "/")
+ *               example:
+ *                 categories: [
+ *                   "Biography & Autobiography",
+ *                   "Fiction",
+ *                   "Juvenile Fiction",
+ *                   "Science",
+ *                   "Young Adult Fiction"
+ *                 ]
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/categories", getAllCategories);
+
 // Create a new book
 /**
  * @swagger
@@ -204,5 +238,6 @@ router.get("/:bookId", getBook);
  *         description: Internal server error
  */
 router.delete("/:bookId", deleteBook);
+
 
 export default router;

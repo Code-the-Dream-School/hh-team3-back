@@ -2,7 +2,22 @@ import { NextFunction, Request, Response } from "express";
 import Book, { IBook } from "../models/Book";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError, NotFoundError } from "../errors";
-import mongoose from "mongoose";
+import Joi from "joi";
+
+const bookJoiSchema = Joi.object({
+  title: Joi.string().required(),
+  googleID: Joi.string().optional(),
+  link: Joi.string().uri().optional(),
+  authors: Joi.array().items(Joi.string().min(1)).required(),
+  publisher: Joi.string().min(1).required(),
+  description: Joi.string().required(),
+  publishedDate: Joi.date().iso().required(),
+  categories: Joi.array().items(Joi.string().required()),
+  imageLinks: Joi.object({
+    smallThumbnail: Joi.string().uri().optional(),
+    thumbnail: Joi.string().uri().optional(),
+  }).optional(),
+});
 
 // Interface for query parameters
 interface IGetBooksQuery {
@@ -36,7 +51,7 @@ const getAllBooks = async (
        }),
      };
    }
-   
+
   // Search by title
   if (search) {
     query.title = { $regex: new RegExp(search, "i") }; // Case-insensitive search
@@ -82,30 +97,15 @@ const getBook = async (
 
 // Create a new book
 const createBook = async (req: Request<{}, {}, IBook>, res: Response, next: NextFunction) => {
-  const {
-    title,
-    googleID,
-    authors,
-    publisher,
-    description,
-    publishedDate,
-    categories,
-  } = req.body;
+ const { googleID, categories } = req.body;
 
-  if (!title) {
-    return next(new BadRequestError("Title is required"));
-  }
-  if (!authors) {
-    return next(new BadRequestError("Authors are required"));
-  }
-  if (!publisher) {
-    return next(new BadRequestError("Publisher is required"));
-  }
-  if (!description) {
-    return next(new BadRequestError("Description is required"));
-  }
-  if (!publishedDate) {
-    return next(new BadRequestError("Published Date is required"));
+  const { error } = bookJoiSchema.validate(req.body);
+  if (error) {
+   try {
+     return next(new BadRequestError(error.details[0].message));
+   } catch {
+     return next(new BadRequestError("Failed to create a new book"));
+   }
   }
 
   // If googleID is provided, it should be unique
@@ -152,4 +152,24 @@ const deleteBook = async (
   }
 };
 
-export { getAllBooks, getBook, createBook, deleteBook };
+const getAllCategories = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const categories = await Book.distinct("categories");
+    const cleanedCategories = categories.map((category: string) => {
+      return category.split("/")[0].trim();
+    });
+
+    const uniqueCategories = [...new Set(cleanedCategories)];
+
+    res.status(StatusCodes.OK).json({ categories: uniqueCategories });
+  } catch (error: unknown) {
+    return next(error);
+  }
+};
+
+
+export { getAllBooks, getBook, createBook, deleteBook, getAllCategories};
