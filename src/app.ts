@@ -5,6 +5,7 @@ import logger from "morgan";
 import dotenv from "dotenv";
 import mainRouter from "./routes/mainRouter";
 import booksRouter from "./routes/bookRoutes";
+import discussionsRouter from "./routes/discussionRoutes";
 import { errorHandlerMiddleware } from "./middleware/error-handler";
 import swaggerDocs from "./utils/swagger";
 
@@ -41,6 +42,7 @@ swaggerDocs(app, swaggerPort);
 
 app.use("/api/v1", mainRouter);
 app.use("/api/v1/books", booksRouter); 
+app.use("/api/v1/discussions", discussionsRouter); 
 
 
 app.use((req: Request, res: Response) => {
