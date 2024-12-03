@@ -193,7 +193,11 @@ const joinDiscussion = async (
   next: NextFunction
 ) => {
   const { discussionId } = req.params;
-  const { user } = req.body;
+  const user: IUser | undefined = req.user;
+
+  if (!user) {
+    return next(new UnauthenticatedError("User is not authenticated"));
+  }
 
   try {
     const discussion = await Discussion.findById(discussionId);
@@ -201,11 +205,11 @@ const joinDiscussion = async (
       return next(new NotFoundError(`No discussion with id ${discussionId}`));
     }
 
-    if (discussion.participants.includes(user)) {
+    if (discussion.participants.includes(user.userId)) {
       return next(new BadRequestError("You are already a participant"));
     }
 
-    discussion.participants.push(user);
+    discussion.participants.push(user.userId);
     await discussion.save();
     res.status(StatusCodes.OK).json({ discussion });
   } catch (error) {
@@ -219,7 +223,11 @@ const unjoinDiscussion = async (
   next: NextFunction
 ) => {
   const { discussionId } = req.params;
-  const { user } = req.body;
+  const user: IUser | undefined = req.user;
+
+  if (!user) {
+    return next(new UnauthenticatedError("User is not authenticated"));
+  }
 
   try {
     const discussion = await Discussion.findById(discussionId);
@@ -227,7 +235,7 @@ const unjoinDiscussion = async (
       return next(new NotFoundError(`No discussion with id ${discussionId}`));
     }
 
-    const participantIndex = discussion.participants.indexOf(user);
+    const participantIndex = discussion.participants.indexOf(user.userId);
     if (participantIndex === -1) {
       return next(
         new BadRequestError("You are not a participant in this discussion")
