@@ -53,6 +53,7 @@ UserSchema.methods.comparePassword = async function (
 const User = mongoose.model<IUser>("User", UserSchema);
 
 export interface IUser extends Document {
+  userId: Schema.Types.ObjectId;
   name: string;
   email: string;
   password: string;

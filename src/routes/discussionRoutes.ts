@@ -6,10 +6,11 @@ import {
   deleteDiscussion,
   joinDiscussion,
   unjoinDiscussion,
+  updateDiscussion,
 } from "../controllers/discussionController";
 import authenticateJWT from "../middleware/authentication";
 
-// Create a router instance
+
 const router = Router();
 
 /**
@@ -195,7 +196,66 @@ router.post("/", authenticateJWT, createDiscussion);
  *         description: Internal server error
  */
 
-router.delete("/:discussionId", authenticateJWT,  deleteDiscussion);
+router.delete("/:discussionId", authenticateJWT, deleteDiscussion);
+
+/**
+ * @swagger
+ * /api/v1/discussions/{discussionId}:
+ *   patch:
+ *     summary: Update an existing discussion
+ *     tags: [Discussions]
+ *     parameters:
+ *       - name: discussionId
+ *         in: path
+ *         required: true
+ *         description: The ID of the discussion to update
+ *         schema:
+ *           type: string
+ *           example: "60b4bca4f1c64f16d1c1c8e4"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "Updated discussion title"
+ *               content:
+ *                 type: string
+ *                 example: "Updated content for the discussion"
+ *               date:
+ *                 type: string
+ *                 format: date-time
+ *                 example: "2024-12-03T14:00:00Z"
+ *               meetingLink:
+ *                 type: string
+ *                 example: "https://example.com/meeting-link"
+ *     responses:
+ *       200:
+ *         description: Discussion updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Discussion updated successfully"
+ *                 discussion:
+ *                   $ref: '#/components/schemas/Discussion'
+ *       400:
+ *         description: Invalid input data
+ *       401:
+ *         description: Unauthorized access
+ *       404:
+ *         description: Discussion not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.patch("/:discussionId", authenticateJWT, updateDiscussion);
 
 /**
  * @swagger

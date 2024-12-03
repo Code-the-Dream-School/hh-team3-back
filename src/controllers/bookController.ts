@@ -52,13 +52,11 @@ const getAllBooks = async (
      };
    }
 
-  // Search by title
   if (search) {
-    query.title = { $regex: new RegExp(search, "i") }; // Case-insensitive search
+    query.title = { $regex: new RegExp(search, "i") };
   }
 
 
-  // Sort options
   const sortOptions: any = {};
   if (sort) {
     if (sort === "a-z") sortOptions.title = 1;
@@ -77,7 +75,6 @@ const getAllBooks = async (
   }
 };
 
-// Get a single book by ID
 const getBook = async (
   req: Request<{ bookId: string }>,
   res: Response,
@@ -95,7 +92,6 @@ const getBook = async (
   }
 };
 
-// Create a new book
 const createBook = async (req: Request<{}, {}, IBook>, res: Response, next: NextFunction) => {
  const { googleID, categories } = req.body;
 

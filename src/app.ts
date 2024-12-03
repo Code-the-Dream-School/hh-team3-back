@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import mainRouter from "./routes/mainRouter";
 import booksRouter from "./routes/bookRoutes";
 import discussionsRouter from "./routes/discussionRoutes";
+import authRouter from "./routes/userRoutes";
 import { errorHandlerMiddleware } from "./middleware/error-handler";
 import swaggerDocs from "./utils/swagger";
 
@@ -41,6 +42,7 @@ swaggerDocs(app, swaggerPort);
 
 
 app.use("/api/v1", mainRouter);
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/books", booksRouter); 
 app.use("/api/v1/discussions", discussionsRouter); 
 
