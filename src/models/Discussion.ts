@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { IDiscussion } from "../interfaces/discussionInterfaces";
 
 const discussionSchema = new Schema(
   {
@@ -44,15 +45,4 @@ const discussionSchema = new Schema(
 );
 
 const Discussion = mongoose.model<IDiscussion>("Discussion", discussionSchema);
-
-export interface IDiscussion extends Document {
-  title: string;
-  book: mongoose.Schema.Types.ObjectId;
-  content: string;
-  date: Date;
-  participants: mongoose.Schema.Types.ObjectId[];
-  meetingLink: string;
-  createdBy: mongoose.Schema.Types.ObjectId;
-}
-
 export default Discussion;

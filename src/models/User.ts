@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { IUser } from "../interfaces/userInterfaces";
 
 
 const UserSchema = new Schema<IUser>({
@@ -52,13 +53,5 @@ UserSchema.methods.comparePassword = async function (
 
 const User = mongoose.model<IUser>("User", UserSchema);
 
-export interface IUser extends Document {
-  userId: Schema.Types.ObjectId;
-  name: string;
-  email: string;
-  password: string;
-  createJWT(): string;
-  comparePassword(candidatePassword: string): Promise<boolean>;
-}
 
 export default User;

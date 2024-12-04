@@ -1,39 +1,29 @@
 import { Request, Response, NextFunction } from "express";
-import Discussion, { IDiscussion } from "../models/Discussion";
 import { StatusCodes } from "http-status-codes";
 import {
   BadRequestError,
   NotFoundError,
   UnauthenticatedError,
 } from "../errors";
-import Joi from "joi";
-import mongoose from "mongoose";
-import { IUser } from "../models/User";
-
-const discussionJoiSchema = Joi.object({
-  title: Joi.string().required(),
-  book: Joi.string().required(),
-  content: Joi.string().required(),
-  date: Joi.date().iso().required(),
-  participants: Joi.array().items(Joi.string()).optional(),
-  meetingLink: Joi.string().uri().required(),
-  createdBy: Joi.string().required(),
-});
-
-interface IGetDiscussionsQuery {
-  search?: string;
-  sort?: "latest" | "oldest";
-}
-
-interface IJoinDiscussionBody {
-  user: mongoose.Schema.Types.ObjectId;
-}
+import {
+  discussionsQuerySchema,
+  discussionJoiSchema,
+  discussionIdSchema,
+} from "../validations/discussionValidation";
+import { IDiscussion, IGetDiscussionsQuery, IJoinDiscussionBody } from "../interfaces/discussionInterfaces";
+import Discussion from "../models/Discussion";
+import { IUser } from "../interfaces/userInterfaces";
 
 const getAllDiscussions = async (
   req: Request<{}, {}, {}, IGetDiscussionsQuery & { bookId?: string }>,
   res: Response,
   next: NextFunction
 ) => {
+  const { error } = discussionsQuerySchema.validate(req.query);
+  if (error) {
+    return next(new BadRequestError(error.details[0].message));
+  }
+
   const { search, sort, bookId } = req.query;
 
   let query: any = {};
@@ -67,6 +57,10 @@ const getDiscussion = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { error } = discussionIdSchema.validate(req.params);
+  if (error) {
+    return next(new BadRequestError(error.details[0].message));
+  }
   const { discussionId } = req.params;
 
   try {
@@ -110,7 +104,12 @@ const deleteDiscussion = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { error } = discussionIdSchema.validate(req.params);
+  if (error) {
+    return next(new BadRequestError(error.details[0].message));
+  }
   const { discussionId } = req.params;
+
   const user: IUser | undefined = req.user;
 
   if (!user) {
@@ -147,7 +146,13 @@ const updateDiscussion = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+
+  const { error } = discussionIdSchema.validate(req.params);
+  if (error) {
+    return next(new BadRequestError(error.details[0].message));
+  }
   const { discussionId } = req.params;
+
   const user: IUser | undefined = req.user;
 
   if (!user) {
@@ -192,7 +197,12 @@ const joinDiscussion = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { error } = discussionIdSchema.validate(req.params);
+  if (error) {
+    return next(new BadRequestError(error.details[0].message));
+  }
   const { discussionId } = req.params;
+
   const user: IUser | undefined = req.user;
 
   if (!user) {
@@ -222,7 +232,12 @@ const unjoinDiscussion = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { error } = discussionIdSchema.validate(req.params);
+  if (error) {
+    return next(new BadRequestError(error.details[0].message));
+  }
   const { discussionId } = req.params;
+
   const user: IUser | undefined = req.user;
 
   if (!user) {

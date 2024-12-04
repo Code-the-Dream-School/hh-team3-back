@@ -10,7 +10,6 @@ import {
 } from "../controllers/discussionController";
 import authenticateJWT from "../middleware/authentication";
 
-
 const router = Router();
 
 /**
@@ -73,7 +72,7 @@ const router = Router();
  */
 
 /**
-  * @swagger
+ * @swagger
  * /api/v1/discussions:
  *   get:
  *     summary: Retrieve all discussions
@@ -195,14 +194,14 @@ router.post("/", authenticateJWT, createDiscussion);
  *       500:
  *         description: Internal server error
  */
-
 router.delete("/:discussionId", authenticateJWT, deleteDiscussion);
 
 /**
+ * /**
  * @swagger
  * /api/v1/discussions/{discussionId}:
  *   patch:
- *     summary: Update an existing discussion
+ *     summary: Update an existing discussion with optional fields
  *     tags: [Discussions]
  *     parameters:
  *       - name: discussionId
@@ -221,17 +220,22 @@ router.delete("/:discussionId", authenticateJWT, deleteDiscussion);
  *             properties:
  *               title:
  *                 type: string
- *                 example: "Updated discussion title"
+ *                 description: The title of the discussion (optional)
  *               content:
  *                 type: string
- *                 example: "Updated content for the discussion"
+ *                 description: The content of the discussion (optional)
  *               date:
  *                 type: string
  *                 format: date-time
- *                 example: "2024-12-03T14:00:00Z"
+ *                 description: The date of the discussion (optional)
  *               meetingLink:
  *                 type: string
- *                 example: "https://example.com/meeting-link"
+ *                 description: The meeting link for the discussion (optional)
+ *             example:
+ *               title: "Updated Discussion Title"
+ *               content: "Updated content for the discussion"
+ *               date: "2024-12-03T10:00:00Z"
+ *               meetingLink: "https://example.com/meeting-link"
  *     responses:
  *       200:
  *         description: Discussion updated successfully
@@ -255,41 +259,6 @@ router.delete("/:discussionId", authenticateJWT, deleteDiscussion);
  *         description: Internal server error
  */
 
-router.patch("/:discussionId", authenticateJWT, updateDiscussion);
-
-/**
- * @swagger
- * /api/v1/discussions/{discussionId}/join:
- *   post:
- *     summary: Join an existing discussion
- *     tags: [Discussions]
- *     parameters:
- *       - in: path
- *         name: discussionId
- *         required: true
- *         schema:
- *           type: string
- *         description: The ID of the discussion to join
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               userId:
- *                 type: string
- *                 example: "60b4bca4f1c64f16d1c1c8e4"
- *     responses:
- *       200:
- *         description: Successfully joined the discussion
- *       400:
- *         description: User is already a participant
- *       404:
- *         description: Discussion not found
- *       500:
- *         description: Internal server error
- */
 router.post("/:discussionId/join", authenticateJWT, joinDiscussion);
 
 /**
@@ -305,26 +274,20 @@ router.post("/:discussionId/join", authenticateJWT, joinDiscussion);
  *         schema:
  *           type: string
  *         description: The ID of the discussion to leave
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               userId:
- *                 type: string
- *                 example: "60b4bca4f1c64f16d1c1c8e4"
  *     responses:
  *       200:
  *         description: Successfully left the discussion
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Discussion'
  *       400:
- *         description: User is not a participant
+ *         description: User is not a participant in this discussion
  *       404:
  *         description: Discussion not found
  *       500:
  *         description: Internal server error
  */
-router.post("/:discussionId/unjoin", authenticateJWT ,unjoinDiscussion);
+router.post("/:discussionId/unjoin", authenticateJWT, unjoinDiscussion);
 
 export default router;
