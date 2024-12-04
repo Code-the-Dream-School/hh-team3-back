@@ -1,30 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import Book, { IBook } from "../models/Book";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError, NotFoundError } from "../errors";
-import Joi from "joi";
+import { bookJoiSchema } from "../validations/bookValidation";
+import { IBook, IGetBooksQuery } from "../interfaces/bookInterfaces";
+import Book from "../models/Book";
 
-const bookJoiSchema = Joi.object({
-  title: Joi.string().required(),
-  googleID: Joi.string().optional(),
-  link: Joi.string().uri().optional(),
-  authors: Joi.array().items(Joi.string().min(1)).required(),
-  publisher: Joi.string().min(1).required(),
-  description: Joi.string().required(),
-  publishedDate: Joi.date().iso().required(),
-  categories: Joi.array().items(Joi.string().required()),
-  imageLinks: Joi.object({
-    smallThumbnail: Joi.string().uri().optional(),
-    thumbnail: Joi.string().uri().optional(),
-  }).optional(),
-});
-
-// Interface for query parameters
-interface IGetBooksQuery {
-  search?: string;
-  categories?: string;
-  sort?: "a-z" | "z-a" | "latest" | "oldest";
-}
 
 // Get all books
 const getAllBooks = async (
@@ -35,7 +15,6 @@ const getAllBooks = async (
   const { search, categories, sort } = req.query;
   let query: any = {};
 
-  // Filter by categories
    if (categories) {
      const categoryArray = Array.isArray(categories)
        ? categories
@@ -43,7 +22,6 @@ const getAllBooks = async (
 
      query.categories = {
        $in: categoryArray.map((category: string) => {
-         // Trim the category and extract the main category before the slash
          const [mainCategory] = category
            .split("/")
            .map((part: string) => part.trim());
@@ -52,13 +30,11 @@ const getAllBooks = async (
      };
    }
 
-  // Search by title
   if (search) {
-    query.title = { $regex: new RegExp(search, "i") }; // Case-insensitive search
+    query.title = { $regex: new RegExp(search, "i") };
   }
 
 
-  // Sort options
   const sortOptions: any = {};
   if (sort) {
     if (sort === "a-z") sortOptions.title = 1;
@@ -77,7 +53,6 @@ const getAllBooks = async (
   }
 };
 
-// Get a single book by ID
 const getBook = async (
   req: Request<{ bookId: string }>,
   res: Response,
@@ -95,7 +70,6 @@ const getBook = async (
   }
 };
 
-// Create a new book
 const createBook = async (req: Request<{}, {}, IBook>, res: Response, next: NextFunction) => {
  const { googleID, categories } = req.body;
 
@@ -133,7 +107,6 @@ const createBook = async (req: Request<{}, {}, IBook>, res: Response, next: Next
   }
 };
 
-// Delete a book by ID
 const deleteBook = async (
   req: Request<{ bookId: string }>,
   res: Response,

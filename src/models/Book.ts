@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { IBook } from "../interfaces/bookInterfaces";
 
-// Define Book Schema
 const bookSchema = new Schema(
   {
     title: {
@@ -55,20 +55,4 @@ const bookSchema = new Schema(
 );
 
 const Book = mongoose.model<IBook>("Book", bookSchema);
-
-export interface IBook extends Document {
-  title: string;
-  googleID: string;
-  link: string;
-  authors: string[];
-  publisher: string;
-  description: string;
-  publishedDate: Date;
-  categories: string[];
-  imageLinks: {
-    smallThumbnail: string;
-    thumbnail: string;
-  };
-}
-
 export default Book;
