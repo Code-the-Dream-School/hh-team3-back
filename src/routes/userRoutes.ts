@@ -32,7 +32,7 @@ const router: Router = express.Router();
  *                   type: object
  *                   properties:
  *                     name: { type: string, example: john }
- *                 token: { type: string, example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzUxMDM2MWU5MDAwNDY2NmJmYTBhM2IiLCJuYW1lIjoiamFuZSIsImlhdCI6MTczMzM2MjUyOSwiZXhwIjoxNzM1OTU0NTI5fQ.1Uu8AGnH6LSHAahDvcVnJiJX6ZVBIe1ZzKvFjwTzDts" }
+ *                 token: { type: string, example: "my_token" }
  *       400:
  *         description: Bad request, missing fields
  *       401:
@@ -75,7 +75,7 @@ const router: Router = express.Router();
  *                       example: john
  *                 token:
  *                   type: string
- *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzRmNmNiMWI4MGY1ZjIzMmJkNDMwNDciLCJuYW1lIjoibGFuYTEiLCJpYXQiOjE3MzMzNjMwOTAsImV4cCI6MTczNTk1NTA5MH0.1SdPRdehraC52kgtw5c1dtHuYGgTjn1TTzGlKa3nCzc"
+ *                   example: "my_token"
  *       400:
  *         description: Bad request, missing fields
  *       401:

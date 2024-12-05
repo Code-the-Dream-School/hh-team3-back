@@ -11,7 +11,6 @@ import {
 import authenticateJWT from "../middleware/authentication";
 
 const router = Router();
-
 /**
  * @swagger
  * components:
@@ -145,6 +144,7 @@ router.get("/:discussionId", getDiscussion);
  * /api/v1/discussions:
  *   post:
  *     summary: Create a new discussion
+ *     description: This endpoint allows an authenticated user to create a new discussion related to a specific book. The user must be logged in, and the input data will be validated before the discussion is created.
  *     tags: [Discussions]
  *     requestBody:
  *       required: true
@@ -152,6 +152,17 @@ router.get("/:discussionId", getDiscussion);
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/Discussion'
+ *           examples:
+ *             example-1:
+ *               summary: Example of a discussion creation request
+ *               value:
+ *                 discussion:
+ *                   title: "Discussion about The Great Gatsby19"
+ *                   book: "6745045ab062cc87d005986d"  # Book ID
+ *                   content: "In this discussion, we’ll explore the themes of wealth, class, and the American Dream in *The Great Gatsby* by F. Scott Fitzgerald."
+ *                   date: "2024-12-01T00:00:00.000Z"
+ *                   participants: []  # Empty list, can be updated later with participants
+ *                   meetingLink: "https://zoom.us/j/1234567890"
  *     responses:
  *       201:
  *         description: Discussion created successfully
@@ -163,21 +174,48 @@ router.get("/:discussionId", getDiscussion);
  *                 message:
  *                   type: string
  *                   example: "Discussion created successfully"
- *                 discussionId:
- *                   type: string
- *                   example: "60b4bca4f1c64f16d1c1c8e4"
+ *                 discussion:
+ *                   $ref: '#/components/schemas/Discussion'
  *       400:
- *         description: Invalid input data
+ *         description: Invalid input data or missing required fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid input data"
+ *       401:
+ *         description: User is not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User is not authenticated"
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "An unexpected error occurred. Please try again later."
  */
+
+
 router.post("/", authenticateJWT, createDiscussion);
 
 /**
  * @swagger
  * /api/v1/discussions/{discussionId}:
  *   delete:
- *     summary: Delete a discussion by ID
+ *     summary: Delete a discussion by its ID
  *     tags: [Discussions]
  *     parameters:
  *       - in: path
@@ -185,15 +223,20 @@ router.post("/", authenticateJWT, createDiscussion);
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the discussion to delete
+ *         description: The ID of the discussion to be deleted
  *     responses:
  *       200:
- *         description: Discussion deleted successfully
+ *         description: The discussion was deleted successfully
+ *       400:
+ *         description: Invalid input or bad request (e.g., invalid discussion ID)
+ *       401:
+ *         description: Unauthorized access (user not authenticated or not authorized to delete the discussion)
  *       404:
- *         description: Discussion not found
+ *         description: Discussion not found with the specified ID
  *       500:
- *         description: Internal server error
+ *         description: Internal server error occurred during deletion process
  */
+
 router.delete("/:discussionId", authenticateJWT, deleteDiscussion);
 
 /**
@@ -216,26 +259,7 @@ router.delete("/:discussionId", authenticateJWT, deleteDiscussion);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *                 description: The title of the discussion (optional)
- *               content:
- *                 type: string
- *                 description: The content of the discussion (optional)
- *               date:
- *                 type: string
- *                 format: date-time
- *                 description: The date of the discussion (optional)
- *               meetingLink:
- *                 type: string
- *                 description: The meeting link for the discussion (optional)
- *             example:
- *               title: "Updated Discussion Title"
- *               content: "Updated content for the discussion"
- *               date: "2024-12-03T10:00:00Z"
- *               meetingLink: "https://example.com/meeting-link"
+ *             $ref: '#/components/schemas/Discussion'
  *     responses:
  *       200:
  *         description: Discussion updated successfully
@@ -253,6 +277,36 @@ router.delete("/:discussionId", authenticateJWT, deleteDiscussion);
  *         description: Invalid input data
  *       401:
  *         description: Unauthorized access
+ *       404:
+ *         description: Discussion not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.patch("/:discussionId", authenticateJWT, updateDiscussion);
+
+/**
+ * @swagger
+ * /api/v1/discussions/{discussionId}/join:
+ *   post:
+ *     summary: Join an ongoing discussion
+ *     tags: [Discussions]
+ *     parameters:
+ *       - in: path
+ *         name: discussionId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the discussion to join
+ *     responses:
+ *       200:
+ *         description: Successfully join the discussion
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Discussion'
+ *       400:
+ *         description: User already a participant in this discussion
  *       404:
  *         description: Discussion not found
  *       500:
