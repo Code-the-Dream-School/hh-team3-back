@@ -27,5 +27,6 @@ export const discussionIdSchema = Joi.object({
 export const discussionsQuerySchema = Joi.object({
   search: Joi.string().optional(),
   sort: Joi.string().valid("latest", "oldest").optional(),
+  timePeriod: Joi.string().valid("future", "past").optional(),
   bookId: bookIdSchema.optional(),
 });
