@@ -225,24 +225,17 @@ const joinDiscussion = async (
 
      const meetingTime = new Date(discussion.date).toLocaleString();
      const meetingLink = discussion.meetingLink;
-
-    const emailContent = {
-      toEmail: user.email,
-      subject: `You've joined the discussion: ${discussion.title}`,
-      htmlContent: `<h3>Hi ${user.name},</h3>
+     const htmlContent = `<h3>Hi ${user.name},</h3>
                     <p>You have successfully joined the discussion: <strong>"${discussion.title}"</strong>.</p>
                     <p><strong>Discussion time:</strong> ${meetingTime}</p>
                     <p><strong>Join the discussion here:</strong> <a href="${meetingLink}">Click to join</a></p>
-                    <p>We are excited to have you participate!</p>`,
-    };
+                    <p>We are excited to have you participate!</p>`;
 
     await sendEmail({
-      fromEmail: process.env.EMAIL || "",
-      toEmail: emailContent.toEmail,
-      fromName: "Book Talk",
-      subject: emailContent.subject,
+      toEmail: user.email,
+      subject: `You've joined the discussion: ${discussion.title}`,
       textContent: "",
-      htmlContent: emailContent.htmlContent,
+      htmlContent: htmlContent,
     });
 
     res.status(StatusCodes.OK).json({ discussion });
@@ -285,21 +278,16 @@ const unjoinDiscussion = async (
     await discussion.save();
 
     const meetingTime = new Date(discussion.date).toLocaleString();
-    const emailContent = {
-      toEmail: user.email,
-      subject: `Successfully Unsubscribed – We’ll Miss You!`,
-      htmlContent: `<h3>Hi ${user.name},</h3>
+    const htmlContent = `<h3>Hi ${user.name},</h3>
                     <p>You have successfully unsubscribed from discussion: <strong>"${discussion.title}"</strong>.</p>
                     <p><strong>Discussion time:</strong> ${meetingTime}</p>
-                    <p><strong>We hope to see you in future discussions</p>`,
-    };
+                    <p><strong>We hope to see you in future discussions</p>`;
+
     await sendEmail({
-      fromEmail: process.env.EMAIL || "",
-      toEmail: emailContent.toEmail,
-      fromName: "Book Talk",
-      subject: emailContent.subject,
+      toEmail: user.email,
+      subject: `Successfully Unsubscribed – We’ll Miss You!`,
       textContent: "",
-      htmlContent: emailContent.htmlContent,
+      htmlContent: htmlContent,
     });
 
     res.status(StatusCodes.OK).json({ discussion });

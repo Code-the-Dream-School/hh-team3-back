@@ -18,9 +18,7 @@ const sendEmailController = async (
 
   try {
     const result = await sendEmail({
-      fromEmail: process.env.EMAIL || "",
       toEmail: toEmail,
-      fromName: "Book Talk",
       subject:
         subject || "It would be wonderful to discuss this book together!",
       textContent: textContent || "",

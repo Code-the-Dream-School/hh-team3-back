@@ -3,8 +3,8 @@ import { SendEmailParams } from "../interfaces/emailInterfaces";
 const mailjet = require("node-mailjet");
 
 
-const mailjetApiKey = process.env.MAILJET_API_KEY||"";
-const mailjetApiSecret = process.env.MAILJET_API_SECRET||"";
+const mailjetApiKey = process.env.MAILJET_API_KEY;
+const mailjetApiSecret = process.env.MAILJET_API_SECRET;
 
 if (!mailjetApiKey || !mailjetApiSecret) {
   throw new BadRequestError("MAILJET_API_KEY and/or MAILJET_API_SECRET are not defined in the environment variables.");
@@ -13,8 +13,6 @@ if (!mailjetApiKey || !mailjetApiSecret) {
 const mailjetClient = mailjet.apiConnect(mailjetApiKey, mailjetApiSecret);
 
 const sendEmail = async ({
-  fromEmail,
-  fromName,
   toEmail,
   subject,
   textContent,
@@ -25,8 +23,8 @@ const sendEmail = async ({
       Messages: [
         {
           From: {
-            Email: fromEmail,
-            Name: fromName,
+            Email: process.env.EMAIL || "",
+            Name: "Book Talk",
           },
           To: [
             {

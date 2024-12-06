@@ -15,7 +15,6 @@ declare module "node-mailjet" {
 
   interface EmailParams {
     fromEmail: string;
-    fromName: string;
     toEmail: string;
     subject: string;
     textContent: string;
