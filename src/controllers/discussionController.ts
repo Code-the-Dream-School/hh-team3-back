@@ -13,6 +13,7 @@ import {
 import { IDiscussion, IGetDiscussionsQuery, IJoinDiscussionBody } from "../interfaces/discussionInterfaces";
 import Discussion from "../models/Discussion";
 import { IUser } from "../interfaces/userInterfaces";
+import { sendEmail } from "../services/mailjetService";
 
 const getAllDiscussions = async (
   req: Request<{}, {}, {}, IGetDiscussionsQuery & { bookId?: string }>,
@@ -221,6 +222,29 @@ const joinDiscussion = async (
 
     discussion.participants.push(user.userId);
     await discussion.save();
+
+     const meetingTime = new Date(discussion.date).toLocaleString();
+     const meetingLink = discussion.meetingLink;
+
+    const emailContent = {
+      toEmail: user.email,
+      subject: `You've joined the discussion: ${discussion.title}`,
+      htmlContent: `<h3>Hi ${user.name},</h3>
+                    <p>You have successfully joined the discussion: <strong>"${discussion.title}"</strong>.</p>
+                    <p><strong>Discussion time:</strong> ${meetingTime}</p>
+                    <p><strong>Join the discussion here:</strong> <a href="${meetingLink}">Click to join</a></p>
+                    <p>We are excited to have you participate!</p>`,
+    };
+
+    await sendEmail({
+      fromEmail: process.env.EMAIL || "",
+      toEmail: emailContent.toEmail,
+      fromName: "Book Talk",
+      subject: emailContent.subject,
+      textContent: "",
+      htmlContent: emailContent.htmlContent,
+    });
+
     res.status(StatusCodes.OK).json({ discussion });
   } catch (error) {
     return next(error);
@@ -259,6 +283,25 @@ const unjoinDiscussion = async (
 
     discussion.participants.splice(participantIndex, 1);
     await discussion.save();
+
+    const meetingTime = new Date(discussion.date).toLocaleString();
+    const emailContent = {
+      toEmail: user.email,
+      subject: `Successfully Unsubscribed – We’ll Miss You!`,
+      htmlContent: `<h3>Hi ${user.name},</h3>
+                    <p>You have successfully unsubscribed from discussion: <strong>"${discussion.title}"</strong>.</p>
+                    <p><strong>Discussion time:</strong> ${meetingTime}</p>
+                    <p><strong>We hope to see you in future discussions</p>`,
+    };
+    await sendEmail({
+      fromEmail: process.env.EMAIL || "",
+      toEmail: emailContent.toEmail,
+      fromName: "Book Talk",
+      subject: emailContent.subject,
+      textContent: "",
+      htmlContent: emailContent.htmlContent,
+    });
+
     res.status(StatusCodes.OK).json({ discussion });
   } catch (error) {
     return next(error);
