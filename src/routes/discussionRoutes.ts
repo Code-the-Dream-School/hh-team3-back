@@ -97,6 +97,13 @@ const router = Router();
  *         schema:
  *           type: string
  *         description: Filter discussions by a specific bookId
+ *       - in: query
+ *         name: timePeriod
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [past, future]
+ *         description: Filter discussions by time period (past or future). 
  *     responses:
  *       200:
  *         description: A list of discussions with the count
@@ -115,6 +122,7 @@ const router = Router();
  *       500:
  *         description: Internal server error
  */
+
 router.get("/", getAllDiscussions);
 
 /**

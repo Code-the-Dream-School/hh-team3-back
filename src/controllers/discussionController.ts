@@ -16,7 +16,12 @@ import { IUser } from "../interfaces/userInterfaces";
 import { sendEmail } from "../services/mailjetService";
 
 const getAllDiscussions = async (
-  req: Request<{}, {}, {}, IGetDiscussionsQuery & { bookId?: string }>,
+  req: Request<
+    {},
+    {},
+    {},
+    IGetDiscussionsQuery & { bookId?: string; timePeriod?: string}
+  >,
   res: Response,
   next: NextFunction
 ) => {
@@ -25,7 +30,7 @@ const getAllDiscussions = async (
     return next(new BadRequestError(error.details[0].message));
   }
 
-  const { search, sort, bookId } = req.query;
+  const { search, sort, bookId, timePeriod } = req.query;
 
   let query: any = {};
 
@@ -35,6 +40,15 @@ const getAllDiscussions = async (
 
   if (search) {
     query.title = { $regex: new RegExp(search, "i") };
+  }
+
+  if (timePeriod) {
+    const currentDate = Date.now();
+    if (timePeriod === "future") {
+      query.date = { $gte: currentDate };
+    } else if (timePeriod === "past") {
+      query.date = { $lt: currentDate };
+    }
   }
 
   const sortOptions: any = {};
