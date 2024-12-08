@@ -1,5 +1,5 @@
 import express, { Request, Response, Router } from "express";
-import { register, login } from "../controllers/userController";
+import { register, login, getUserProfile, updateUserProfile } from "../controllers/userController";
 
 // Create an instance of the express router
 const router: Router = express.Router();
@@ -90,5 +90,13 @@ router.post("/register", register);
 
 // User login route
 router.post("/login", login);
+
+//Get user profile route
+router.get("/profile", getUserProfile);
+
+//Update user profile route
+router.post("/profile", updateUserProfile);
+
+
 
 export default router;

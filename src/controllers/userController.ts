@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import User from "../models/User";
 import { StatusCodes } from "http-status-codes";
-import { BadRequestError, UnauthenticatedError } from "../errors";
+import { BadRequestError, NotFoundError, UnauthenticatedError } from "../errors";
 
 
 const register = async (
@@ -62,4 +62,55 @@ const login = async (
   res.status(StatusCodes.OK).json({ user: { name: user.name }, token });
 };
 
-export { register, login };
+const getUserProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { email } = req.body;
+
+  
+  //User Profile
+  //???????? Allow users to view and track their reading progress.
+  // Enable users to add and edit personal information.
+  
+  //verify the email existance
+  if (!email) {
+    return next(new BadRequestError("Please provide the email!"));
+  }
+
+  //request the profile from the DB
+  const userProfile = await User.findOne({"email": email});
+
+  //build the response
+  if (!userProfile) {
+    return next(new NotFoundError("The user with such email was not found"));
+  }
+
+  res.status(StatusCodes.OK).json({ name: userProfile.name, email: userProfile.email, id: userProfile._id });
+
+};
+
+const updateUserProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { name, email } = req.body;
+
+  //User Profile
+  // Allow users to view and track their reading progress.
+  // Enable users to add and edit personal information.
+
+  //verify the email existance
+
+  //request the profile from the DB
+
+  //update the profile
+
+  //build the response
+  res.status(StatusCodes.OK).json({ response: "OK" });
+
+};
+
+export { register, login, getUserProfile, updateUserProfile };
