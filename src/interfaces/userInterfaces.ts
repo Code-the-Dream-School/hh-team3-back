@@ -8,3 +8,8 @@ export interface IUser extends Document {
   createJWT(): string;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
+
+export interface UpdateContent {
+  name?: string;
+  email?: string;
+}
