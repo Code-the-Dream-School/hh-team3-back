@@ -127,7 +127,7 @@ const updateUserProfile = async (
 
     const updatedUser = await User.findByIdAndUpdate(userIdToBeUpdated, updateContent, { new: true, runValidators: true });
 
-    res.status(StatusCodes.OK).json({ message: "User has been updated", updated: updatedUser });
+    res.status(StatusCodes.OK).json({ message: "User has been updated" });
   } catch (error) {
     return next(error);
   }
