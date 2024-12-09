@@ -86,6 +86,101 @@ const router: Router = express.Router();
  *         description: Internal server error
  */
 
+/**
+ * @swagger
+ * /api/v1/auth/profile:
+ *   get:
+ *     summary: Get the profile of the existing user
+ *     tags: [Auth]
+ *     security:
+ *       bearerAuth: token 
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email: 
+ *                 type: string
+ *                 example: john@gmail.com
+ *     responses:
+ *       200:
+ *         description: Profile has been found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                 name:
+ *                   type: string
+ *                   example: john
+ *                 email:
+ *                   type: string
+ *                   example: john@john.com
+ *                 id:
+ *                   type: string
+ *                   example: 675332327a5f1dac22191c22
+ *       400:
+ *         description: Bad request, missing email field
+ *       401:
+ *         description: Unauthorized, user is not authorized
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /api/v1/auth/profile/{userId}:
+ *   post:
+ *     summary: Login an existing user
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: token 
+ *     parameters:
+ *        - in: path
+ *          name: userId
+ *          required: true
+ *          schema:
+ *            type: string
+ *          description: The ID of the user to retrieve
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email: 
+ *                 type: string
+ *                 example: john@gmail.com
+ *               password: 
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: User logged in successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: john
+ *       400:
+ *         description: Bad request, missing fields
+ *       401:
+ *         description: Unauthorized, user tries to update another user
+ *       500:
+ *         description: Internal server error
+ */
+
 
 // User registration route
 router.post("/register", register);
