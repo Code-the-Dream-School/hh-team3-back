@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import User from "../models/User";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError, NotFoundError, UnauthenticatedError } from "../errors";
+import { UpdateContent, IUser } from "../interfaces/userInterfaces";
 
 
 const register = async (
@@ -67,27 +68,31 @@ const getUserProfile = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { email } = req.body;
 
-  
-  //User Profile
-  //???????? Allow users to view and track their reading progress.
-  // Enable users to add and edit personal information.
-  
-  //verify the email existance
-  if (!email) {
-    return next(new BadRequestError("Please provide the email!"));
+  const user: IUser | undefined = req.user;
+
+  if (!user) {
+    return next(new UnauthenticatedError("User is not authenticated"));
   }
 
-  //request the profile from the DB
-  const userProfile = await User.findOne({"email": email});
+  try {
 
-  //build the response
-  if (!userProfile) {
-    return next(new NotFoundError("The user with such email was not found"));
+    const { email } = req.body;
+
+    if (!email) {
+      return next(new BadRequestError("Please provide the email!"));
+    }
+
+    const userProfile = await User.findOne({ "email": email });
+
+    if (!userProfile) {
+      return next(new NotFoundError("The user with such email was not found"));
+    }
+
+    res.status(StatusCodes.OK).json({ name: userProfile.name, email: userProfile.email, id: userProfile._id });
+  } catch (error) {
+    return next(error);
   }
-
-  res.status(StatusCodes.OK).json({ name: userProfile.name, email: userProfile.email, id: userProfile._id });
 
 };
 
@@ -96,20 +101,36 @@ const updateUserProfile = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { name, email } = req.body;
+  //password could be added later if we'll decide to provide this option to the user
+  const { body: { name, email }, params: { id: userIdToBeUpdated } } = req;
 
-  //User Profile
-  // Allow users to view and track their reading progress.
-  // Enable users to add and edit personal information.
+  const user: IUser | undefined = req.user;
 
-  //verify the email existance
+  if (!user) {
+    return next(new UnauthenticatedError("User is not authenticated"));
+  }
 
-  //request the profile from the DB
+  //depending on the Front we can change the approach and compare by e.g. email
+  if (user.userId.toString() !== userIdToBeUpdated) {
+    return next(new UnauthenticatedError("You aren't authorized to update this user"))
+  }
 
-  //update the profile
+  try {
+    let updateContent: UpdateContent = {};
 
-  //build the response
-  res.status(StatusCodes.OK).json({ response: "OK" });
+    if ((!name && !email) || (name === "" && email === "")) {
+      return next(new BadRequestError("Please provide valid content for update"));
+    }
+
+    updateContent.name = name || user.name;
+    updateContent.email = email || user.email;
+
+    const updatedUser = await User.findByIdAndUpdate(userIdToBeUpdated, updateContent, { new: true, runValidators: true });
+
+    res.status(StatusCodes.OK).json({ message: "User has been updated", updated: updatedUser });
+  } catch (error) {
+    return next(error);
+  }
 
 };
 

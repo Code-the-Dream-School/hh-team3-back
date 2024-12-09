@@ -1,5 +1,7 @@
 import express, { Request, Response, Router } from "express";
 import { register, login, getUserProfile, updateUserProfile } from "../controllers/userController";
+import authenticateJWT from "../middleware/authentication";
+
 
 // Create an instance of the express router
 const router: Router = express.Router();
@@ -92,10 +94,10 @@ router.post("/register", register);
 router.post("/login", login);
 
 //Get user profile route
-router.get("/profile", getUserProfile);
+router.get("/profile", authenticateJWT, getUserProfile);
 
 //Update user profile route
-router.post("/profile", updateUserProfile);
+router.post("/profile/:id", authenticateJWT, updateUserProfile);
 
 
 
