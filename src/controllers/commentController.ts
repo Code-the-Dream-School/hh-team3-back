@@ -3,11 +3,10 @@ import {
   BadRequestError,
   UnauthenticatedError,
 } from "../errors";
-import { IComment } from "../interfaces/commentInterfaces";
 import { commentJoiSchema, commentsQuerySchema } from "../validations/commentValidation";
 import { IUser } from "../interfaces/userInterfaces";
 import { StatusCodes } from "http-status-codes";
-import Comment from "../models/Comment";
+import Comment, { IComment } from "../models/Comment";
 import { bookIdSchema } from "../validations/bookValidation";
 
 export const createCommentToBook = async (

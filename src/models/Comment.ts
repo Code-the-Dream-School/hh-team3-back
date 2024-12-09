@@ -1,5 +1,11 @@
-import mongoose, {Schema } from "mongoose";
-import { IComment } from "../interfaces/commentInterfaces";
+import mongoose, { Schema, Document, ObjectId } from "mongoose";
+
+export interface IComment extends Document {
+  user: ObjectId;
+  book: ObjectId;
+  text: string;
+  likeCount: number;
+}
 
 const commentSchema = new Schema(
   {
