@@ -1,10 +1,25 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import User from "../models/User";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError, UnauthenticatedError } from "../errors";
 
 
-const register = async (req: Request, res: Response): Promise<void> => {
+const register = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return next( new BadRequestError("Please provide name, email and password"));
+  }
+
+  const user = await User.findOne({ email });
+  if (user) {
+    return next( new UnauthenticatedError("A user with this email already exists"));
+  }
+
   try {
     const user = await User.create({ ...req.body });
     const token = user.createJWT();
@@ -18,17 +33,21 @@ const register = async (req: Request, res: Response): Promise<void> => {
 
 
 
-const login = async (req: Request, res: Response): Promise<void> => {
+const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    throw new BadRequestError("Please provide email and password");
+    return next( new BadRequestError("Please provide email and password"));
   }
 
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw new UnauthenticatedError("Invalid Credentials");
+    return next( new UnauthenticatedError("Invalid Credentials"));
   }
 
   const isPasswordCorrect = await user.comparePassword(password);
