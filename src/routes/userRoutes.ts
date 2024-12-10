@@ -4,7 +4,6 @@ import { register, login } from "../controllers/userController";
 // Create an instance of the express router
 const router: Router = express.Router();
 
-// Swagger: User registration
 /**
  * @swagger
  * /api/auth/register:
@@ -29,11 +28,17 @@ const router: Router = express.Router();
  *             schema:
  *               type: object
  *               properties:
- *                 message: { type: string, example: User registered successfully }
- *                 userId: { type: integer, example: 12345 }
- *       400: { description: Bad request, invalid input data }
- *       409: { description: Conflict, user already exists }
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     name: { type: string, example: john }
+ *                 token: { type: string, example: "my_token" }
+ *       400:
+ *         description: Bad request, missing fields
+ *       401:
+ *         description: Conflict, user already exists
  */
+
 
 /**
  * @swagger
@@ -48,8 +53,12 @@ const router: Router = express.Router();
  *           schema:
  *             type: object
  *             properties:
- *               email: { type: string, example: john@gmail.com }
- *               password: { type: string, example: password123 }
+ *               email: 
+ *                 type: string
+ *                 example: john@gmail.com
+ *               password: 
+ *                 type: string
+ *                 example: password123
  *     responses:
  *       200:
  *         description: User logged in successfully
@@ -58,8 +67,15 @@ const router: Router = express.Router();
  *             schema:
  *               type: object
  *               properties:
- *                 message: { type: string, example: Login successful }
- *                 token: { type: string, example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." }
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: john
+ *                 token:
+ *                   type: string
+ *                   example: "my_token"
  *       400:
  *         description: Bad request, missing fields
  *       401:
@@ -67,6 +83,7 @@ const router: Router = express.Router();
  *       500:
  *         description: Internal server error
  */
+
 
 // User registration route
 router.post("/register", register);

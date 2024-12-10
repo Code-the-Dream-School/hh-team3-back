@@ -12,12 +12,13 @@ const register = async (
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
-    return next( new BadRequestError("Please provide name, email and password"));
+    return next(new BadRequestError("Please provide name, email and password"));
   }
 
   const user = await User.findOne({ email });
+
   if (user) {
-    return next( new UnauthenticatedError("A user with this email already exists"));
+    return next(new UnauthenticatedError("User with this email already exist"));
   }
 
   try {
@@ -41,19 +42,19 @@ const login = async (
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return next( new BadRequestError("Please provide email and password"));
+    return next(new BadRequestError("Please provide email and password"));
   }
 
   const user = await User.findOne({ email });
 
   if (!user) {
-    return next( new UnauthenticatedError("Invalid Credentials"));
+    return next(new UnauthenticatedError("Invalid Credentials"));
   }
 
   const isPasswordCorrect = await user.comparePassword(password);
 
   if (!isPasswordCorrect) {
-    throw new UnauthenticatedError("Invalid Credentials");
+    return next(new UnauthenticatedError("Invalid Credentials"));
   }
 
   const token = user.createJWT();

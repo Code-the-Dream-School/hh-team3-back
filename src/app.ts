@@ -6,6 +6,7 @@ import favicon from "express-favicon";
 import logger from "morgan";
 import mainRouter from "./routes/mainRouter";
 import booksRouter from "./routes/bookRoutes";
+import commentRouter from "./routes/commentRoutes";
 import discussionsRouter from "./routes/discussionRoutes";
 import authRouter from "./routes/userRoutes";
 import emailRouter from "./routes/emailRoutes";
@@ -44,6 +45,7 @@ swaggerDocs(app, swaggerPort);
 app.use("/api/v1", mainRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/books", booksRouter); 
+app.use("/api/v1/comments", commentRouter); 
 app.use("/api/v1/discussions", discussionsRouter); 
 app.use("/api/v1/email", emailRouter);
 
