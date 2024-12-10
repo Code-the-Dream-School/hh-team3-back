@@ -1,17 +1,17 @@
 import express, { Request, Response, NextFunction, Express } from "express";
 import cors from "cors";
+import * as dotenv from "dotenv";
+dotenv.config();
 import favicon from "express-favicon";
 import logger from "morgan";
-import dotenv from "dotenv";
 import mainRouter from "./routes/mainRouter";
 import booksRouter from "./routes/bookRoutes";
 import commentRouter from "./routes/commentRoutes";
 import discussionsRouter from "./routes/discussionRoutes";
 import authRouter from "./routes/userRoutes";
+import emailRouter from "./routes/emailRoutes";
 import { errorHandlerMiddleware } from "./middleware/error-handler";
 import swaggerDocs from "./utils/swagger";
-
-dotenv.config();
 
 // Extra security packages
 const helmet = require('helmet');
@@ -47,6 +47,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/books", booksRouter); 
 app.use("/api/v1/comments", commentRouter); 
 app.use("/api/v1/discussions", discussionsRouter); 
+app.use("/api/v1/email", emailRouter);
 
 
 app.use((req: Request, res: Response) => {

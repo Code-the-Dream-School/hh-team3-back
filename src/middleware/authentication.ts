@@ -28,13 +28,12 @@ const authenticateJWT = async (
       process.env.JWT_SECRET as string
     ) as JwtPayload;
 
-    if (!payload.userId || !payload.name) {
+    if (!payload.userId) {
       return next(new UnauthenticatedError("Invalid token"));
     }
 
     req.user = {
-      userId: payload.userId,
-      name: payload.name,
+      userId: payload.userId
     } as unknown as IUser;
 
     next(); 
