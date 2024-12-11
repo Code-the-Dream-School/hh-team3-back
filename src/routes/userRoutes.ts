@@ -93,7 +93,14 @@ const router: Router = express.Router();
  *     summary: Get the profile of the existing user
  *     tags: [Auth]
  *     security:
- *       bearerAuth: token 
+ *       - bearerAuth: token 
+ *     parameters:
+ *       - name: email
+ *         in: query
+ *         description: The email address of the user to retrieve.
+ *         required: true
+ *         schema:
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -112,8 +119,6 @@ const router: Router = express.Router();
  *             schema:
  *               type: object
  *               properties:
- *                 user:
- *                   type: object
  *                 name:
  *                   type: string
  *                   example: john
@@ -133,19 +138,12 @@ const router: Router = express.Router();
 
 /**
  * @swagger
- * /api/v1/auth/profile/{userId}:
+ * /api/v1/auth/profile:
  *   post:
  *     summary: Login an existing user
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: token 
- *     parameters:
- *        - in: path
- *          name: userId
- *          required: true
- *          schema:
- *            type: string
- *          description: The ID of the user to retrieve
  *     requestBody:
  *       required: true
  *       content:
@@ -153,12 +151,12 @@ const router: Router = express.Router();
  *           schema:
  *             type: object
  *             properties:
+ *               name: 
+ *                 type: string
+ *                 example: john
  *               email: 
  *                 type: string
  *                 example: john@gmail.com
- *               password: 
- *                 type: string
- *                 example: password123
  *     responses:
  *       200:
  *         description: User logged in successfully
