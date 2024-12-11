@@ -76,18 +76,23 @@ const getUserProfile = async (
   }
 
   try {
-
-    const { email } = req.body;
-
-    if (!email) {
-      return next(new BadRequestError("Please provide the email!"));
+    
+    const email = req.query.email as string;
+    console.log("Query email:", email);
+    console.log("Query email type:", typeof(email));
+    
+    let userProfile;
+    
+    if (email) {      
+      userProfile = await User.findOne({ "email": email });
+    } else {
+      userProfile = await User.findOne({ "_id": user.userId });
     }
-
-    const userProfile = await User.findOne({ "email": email });
-
+        
     if (!userProfile) {
-      return next(new NotFoundError("The user with such email was not found"));
+      return next(new NotFoundError("The user was not found"));
     }
+
 
     res.status(StatusCodes.OK).json({ name: userProfile.name, email: userProfile.email, id: userProfile._id });
   } catch (error) {
@@ -101,18 +106,12 @@ const updateUserProfile = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  //password could be added later if we'll decide to provide this option to the user
-  const { body: { name, email }, params: { id: userIdToBeUpdated } } = req;
+  const { name, email }= req.body;
 
   const user: IUser | undefined = req.user;
 
   if (!user) {
     return next(new UnauthenticatedError("User is not authenticated"));
-  }
-
-  //depending on the Front we can change the approach and compare by e.g. email
-  if (user.userId.toString() !== userIdToBeUpdated) {
-    return next(new UnauthenticatedError("You aren't authorized to update this user"))
   }
 
   try {
@@ -125,7 +124,7 @@ const updateUserProfile = async (
     updateContent.name = name || user.name;
     updateContent.email = email || user.email;
 
-    const updatedUser = await User.findByIdAndUpdate(userIdToBeUpdated, updateContent, { new: true, runValidators: true });
+    const updatedUser = await User.findByIdAndUpdate(user.userId, updateContent, { new: true, runValidators: true });
 
     res.status(StatusCodes.OK).json({ message: "User has been updated" });
   } catch (error) {

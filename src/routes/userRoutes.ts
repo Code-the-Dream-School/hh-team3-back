@@ -192,7 +192,7 @@ router.post("/login", login);
 router.get("/profile", authenticateJWT, getUserProfile);
 
 //Update user profile route
-router.post("/profile/:id", authenticateJWT, updateUserProfile);
+router.post("/profile/", authenticateJWT, updateUserProfile);
 
 
 
