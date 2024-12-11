@@ -97,20 +97,11 @@ const router: Router = express.Router();
  *     parameters:
  *       - name: email
  *         in: query
- *         description: The email address of the user to retrieve.
- *         required: true
+ *         description: The email address of the user to retrieve (optional if authenticated).
+ *         required: false
  *         schema:
  *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email: 
- *                 type: string
- *                 example: john@gmail.com
+ *           example: john@gmail.com
  *     responses:
  *       200:
  *         description: Profile has been found
@@ -132,6 +123,8 @@ const router: Router = express.Router();
  *         description: Bad request, missing email field
  *       401:
  *         description: Unauthorized, user is not authorized
+ *       404:
+ *         description: User profile not found
  *       500:
  *         description: Internal server error
  */
@@ -140,7 +133,7 @@ const router: Router = express.Router();
  * @swagger
  * /api/v1/auth/profile:
  *   post:
- *     summary: Login an existing user
+ *     summary: Update profile an existing user
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: token 
