@@ -8,6 +8,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: "user" | "admin";
+  passwordResetToken?: string;
   createJWT(): string;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
@@ -35,9 +36,13 @@ const UserSchema = new Schema<IUser>({
   },
   role: {
     type: String,
-    enum: ['user', 'admin'],
-    default: 'user',
-  }
+    enum: ["user", "admin"],
+    default: "user",
+  },
+  passwordResetToken: {
+    type: String,
+    default: undefined,
+  },
 });
 
 UserSchema.pre<IUser>("save", async function (next) {

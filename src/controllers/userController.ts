@@ -3,7 +3,9 @@ import User, { IUser } from "../models/User";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError, NotFoundError, UnauthenticatedError } from "../errors";
 import { UpdateContent } from "../interfaces/userInterfaces";
-import { loginJoiSchema, registerJoiSchema, updateUserProfileJoiSchema } from "../validations/userValidation";
+import { loginJoiSchema, registerJoiSchema, requestPasswordResetJoiSchema, resetPasswordJoiSchema, updateUserProfileJoiSchema } from "../validations/userValidation";
+import jwt from "jsonwebtoken";
+import { sendEmail } from "../services/mailjetService";
 
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
@@ -140,4 +142,100 @@ const updateUserProfile = async (
   }
 };
 
-export { register, login, getUserProfile, updateUserProfile };
+const requestPasswordReset = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+
+  const { error } = requestPasswordResetJoiSchema.validate(req.body);
+  if (error) {
+    return next(new BadRequestError(error.details[0].message));
+  }
+  
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new NotFoundError("User with this email does not exist"));
+  }
+
+  const resetToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
+    expiresIn: "1h",
+  });
+
+  user.passwordResetToken = resetToken;
+  await user.save();
+
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+  try {
+
+    const htmlContent = `<p>We received a request to reset your password. To reset your password, click the link below:</p>
+    <p><strong>Reset Password:</strong> <a href="${resetUrl}">Click to reset</a></p>
+    <p>If you didn't request this, please ignore this email.</p>`;
+
+    await sendEmail({
+      toEmail: user.email,
+      subject: `Your Password Reset Link`,
+      htmlContent: htmlContent,
+    });
+
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Password reset link sent to email" });
+  } catch (error) {
+    return next(new Error("Failed to send email"));
+  }
+};
+
+const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { error } = resetPasswordJoiSchema.validate(req.body);
+  if (error) {
+    return next(new BadRequestError(error.details[0].message));
+  }
+
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return next(new BadRequestError("Token and new password are required"));
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      userId: string;
+    };
+    const user = await User.findOne({ _id: decoded.userId });
+
+    if (!user) {
+      return next(new NotFoundError("User not found"));
+    }
+
+    if (user.passwordResetToken !== token) {
+      return next(new BadRequestError("Invalid token"));
+    }
+
+    user.password = newPassword;
+    user.passwordResetToken = undefined;
+    await user.save();
+
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Password has been reset successfully" });
+  } catch (error) {
+    return next(new BadRequestError("Invalid or expired token"));
+  }
+};
+
+export {
+  register,
+  login,
+  getUserProfile,
+  updateUserProfile,
+  requestPasswordReset,
+  resetPassword
+};

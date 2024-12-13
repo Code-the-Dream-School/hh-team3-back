@@ -41,3 +41,23 @@ export const updateUserProfileJoiSchema = Joi.object({
   email: Joi.string().email().trim().min(1).optional(),
   role: Joi.string().valid("user", "admin").optional(),
 });
+
+export const requestPasswordResetJoiSchema = Joi.object({
+  email: Joi.string().email().required().messages({
+    "string.email": "Please provide a valid email address.",
+    "string.empty": "Email is required.",
+    "any.required": "Email is required.",
+  }),
+});
+
+export const resetPasswordJoiSchema = Joi.object({
+  token: Joi.string().required().messages({
+    "string.empty": "Token is required",
+    "any.required": "Token is required",
+  }),
+  newPassword: Joi.string().min(6).required().messages({
+    "string.empty": "New password is required",
+    "string.min": "New password must be at least 6 characters long",
+    "any.required": "New password is required",
+  }),
+});

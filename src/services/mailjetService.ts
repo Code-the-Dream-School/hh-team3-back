@@ -15,8 +15,8 @@ const mailjetClient = mailjet.apiConnect(mailjetApiKey, mailjetApiSecret);
 const sendEmail = async ({
   toEmail,
   subject,
-  textContent,
-  htmlContent,
+  textContent = "",
+  htmlContent = "",
 }: SendEmailParams): Promise<any> => {
   try {
     const request = mailjetClient.post("send", { version: "v3.1" }).request({
