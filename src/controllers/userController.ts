@@ -1,21 +1,18 @@
 import { NextFunction, Request, Response } from "express";
-import User from "../models/User";
+import User, { IUser } from "../models/User";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError, NotFoundError, UnauthenticatedError } from "../errors";
-import { UpdateContent, IUser } from "../interfaces/userInterfaces";
+import { UpdateContent } from "../interfaces/userInterfaces";
+import { loginJoiSchema, registerJoiSchema, updateUserProfileJoiSchema } from "../validations/userValidation";
 
 
-const register = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  const { name, email, password } = req.body;
-
-  if (!name || !email || !password) {
-    return next(new BadRequestError("Please provide name, email and password"));
+const register = async (req: Request, res: Response, next: NextFunction) => {
+  const { error } = registerJoiSchema.validate(req.body);
+  if (error) {
+    return next(new BadRequestError(error.details[0].message));
   }
 
+  const {email} = req.body;
   const user = await User.findOne({ email });
 
   if (user) {
@@ -23,7 +20,10 @@ const register = async (
   }
 
   try {
-    const user = await User.create({ ...req.body });
+    const user = await User.create({
+      ...req.body,
+      role: req.body.role || "user",
+    });
     const token = user.createJWT();
     res.status(StatusCodes.CREATED).json({ user: { name: user.name }, token });
   } catch (error) {
@@ -35,17 +35,13 @@ const register = async (
 
 
 
-const login = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return next(new BadRequestError("Please provide email and password"));
+const login = async (req: Request, res: Response, next: NextFunction) => {
+  const { error } = loginJoiSchema.validate(req.body);
+  if (error) {
+    return next(new BadRequestError(error.details[0].message));
   }
 
+  const { email, password } = req.body;
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -94,7 +90,14 @@ const getUserProfile = async (
     }
 
 
-    res.status(StatusCodes.OK).json({ name: userProfile.name, email: userProfile.email, id: userProfile._id });
+    res
+      .status(StatusCodes.OK)
+      .json({
+        name: userProfile.name,
+        email: userProfile.email,
+        id: userProfile._id,
+        role: userProfile.role,
+      });
   } catch (error) {
     return next(error);
   }
@@ -105,8 +108,13 @@ const updateUserProfile = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
-  const { name, email }= req.body;
+) => {
+  const { error } = updateUserProfileJoiSchema.validate(req.body);
+  if (error) {
+    return next(new BadRequestError(error.details[0].message));
+  }
+
+  const { name, email, role } = req.body;
 
   const user: IUser | undefined = req.user;
 
@@ -116,21 +124,20 @@ const updateUserProfile = async (
 
   try {
     let updateContent: UpdateContent = {};
-
-    if ((!name && !email) || (name === "" && email === "")) {
-      return next(new BadRequestError("Please provide valid content for update"));
-    }
-
     updateContent.name = name || user.name;
     updateContent.email = email || user.email;
+    updateContent.role = role || user.role;
 
-    const updatedUser = await User.findByIdAndUpdate(user.userId, updateContent, { new: true, runValidators: true });
+    const updatedUser = await User.findByIdAndUpdate(
+      user.userId,
+      updateContent,
+      { new: true, runValidators: true }
+    );
 
     res.status(StatusCodes.OK).json({ message: "User has been updated" });
   } catch (error) {
     return next(error);
   }
-
 };
 
 export { register, login, getUserProfile, updateUserProfile };

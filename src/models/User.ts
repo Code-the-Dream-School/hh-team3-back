@@ -1,8 +1,16 @@
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { IUser } from "../interfaces/userInterfaces";
 
+export interface IUser extends Document {
+  userId: Schema.Types.ObjectId;
+  name: string;
+  email: string;
+  password: string;
+  role: "user" | "admin";
+  createJWT(): string;
+  comparePassword(candidatePassword: string): Promise<boolean>;
+}
 
 const UserSchema = new Schema<IUser>({
   name: {
@@ -25,6 +33,11 @@ const UserSchema = new Schema<IUser>({
     required: [true, "Please provide password"],
     minlength: 6,
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  }
 });
 
 UserSchema.pre<IUser>("save", async function (next) {
@@ -37,7 +50,7 @@ UserSchema.pre<IUser>("save", async function (next) {
 
 UserSchema.methods.createJWT = function (): string {
   return jwt.sign(
-    { userId: this._id, name: this.name, email: this.email},
+    { userId: this._id},
     process.env.JWT_SECRET as string,
     {
       expiresIn: process.env.JWT_LIFETIME,

@@ -8,6 +8,36 @@ const router: Router = express.Router();
 
 /**
  * @swagger
+ * components:
+  *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: "60b4bca4f1c64f16d1c1c8e4"
+ *         name:
+ *           type: string
+ *           description: User's name
+ *           example: John
+ *         email:
+ *           type: string
+ *           description: User's email address
+ *           example: john@gmail.com
+ *         password:
+ *            type: string
+ *            example: password123
+ *         role:
+ *           type: string
+ *           description: User's role (either 'user' or 'admin')
+ *           enum:
+ *             - user
+ *             - admin
+ *           example: user
+ */
+
+/**
+ * @swagger
  * /api/v1/auth/register:
  *   post:
  *     summary: Register a new user
@@ -28,13 +58,7 @@ const router: Router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 user:
- *                   type: object
- *                   properties:
- *                     name: { type: string, example: john }
- *                 token: { type: string, example: "my_token" }
+ *               $ref: '#/components/schemas/User'
  *       400:
  *         description: Bad request, missing fields
  *       401:
@@ -107,18 +131,8 @@ const router: Router = express.Router();
  *         description: Profile has been found
  *         content:
  *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 name:
- *                   type: string
- *                   example: john
- *                 email:
- *                   type: string
- *                   example: john@john.com
- *                 id:
- *                   type: string
- *                   example: 675332327a5f1dac22191c22
+  *             schema:
+ *               $ref: '#/components/schemas/User'
  *       400:
  *         description: Bad request, missing email field
  *       401:
@@ -158,16 +172,13 @@ const router: Router = express.Router();
  *             schema:
  *               type: object
  *               properties:
- *                 user:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *                       example: john
+ *                 message:
+ *                   type: string
+ *                   example: "User has been updated"
  *       400:
  *         description: Bad request, missing fields
  *       401:
- *         description: Unauthorized, user tries to update another user
+ *         description: Unauthorized
  *       500:
  *         description: Internal server error
  */
