@@ -1,7 +1,7 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { CustomAPIError, UnauthenticatedError } from "../errors";
-import { IUser } from "../interfaces/userInterfaces";
+import { IUser } from "../models/User";
 
 const authenticateJWT = async (
   req: Request,
