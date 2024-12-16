@@ -118,12 +118,15 @@ export const likeCommentToBook = async (
 
   try {
     if (isLiked) {
-      res.status(StatusCodes.BAD_REQUEST).json({ message: "You've already liked this comment" });
+      comment.likes = comment.likes.filter(like => like.toString() !== userId);
+      comment.likeCount = comment.likes.length;
+      await comment.save();
+      res.status(StatusCodes.OK).json({ message: "Your like has been removed!" });
     } else {
       comment.likes.push(userId);
       comment.likeCount = comment.likes.length;
       await comment.save();
-      res.status(StatusCodes.OK).json({ comment });
+      res.status(StatusCodes.OK).json({ message: "You liked the comment!" });
     }
   } catch (error) {
     return next(error);
