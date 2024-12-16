@@ -8,7 +8,7 @@ const router = Router();
  * @swagger
  * /api/v1/comments:
  *   post:
- *     summary: Create a new comment on a book
+ *     summary: Create a new comment on a book or discussion
  *     description: This endpoint allows an authenticated user to create a new comment on a specific book. The user must be logged in, and the input data will be validated before the comment is created.
  *     tags: [Comments]
  *     requestBody:
@@ -19,12 +19,20 @@ const router = Router();
  *             $ref: '#/components/schemas/Comment'
  *           examples:
  *             example-1:
- *               summary: Example of a comment creation request
+ *               summary: Example of a comment on a book
  *               value:
  *                 comment:
  *                   text: "This is a great analysis of the themes in *The Great Gatsby*! I agree that wealth plays a huge role in the story."
  *                   book: "6745045ab062cc87d005986d"  # Book ID (this should be the actual ID of the book)
  *                   user: "60dcbf9b8f3b2a001c8d5a4b"  # User ID of the comment's author (referencing an existing user)
+ *                   likeCount: 0
+ *             example-2:
+ *               summary: Example of a comment on a discussion
+ *               value:
+ *                 comment:
+ *                   text: "Interesting points about *The Great Gatsby*! The role of social class definitely adds to the story's tension."
+ *                   discussion: "6745045ab062cc87d005986d"
+ *                   user: "60dcbf9b8f3b2a001c8d5a4b"
  *                   likeCount: 0
  *     responses:
  *       201:
@@ -106,15 +114,15 @@ router.post("/", authenticateJWT, createCommentToBook);
  * @swagger
  * /api/v1/comments:
  *   get:
- *     summary: Retrieve comments (all or for a specific book)
+ *     summary: Retrieve comments for a specific book or discussion
  *     description: This endpoint retrieves a list of comments, optionally filtered by a specific book ID.
  *     parameters:
  *       - in: query
- *         name: bookId
- *         required: false
+ *         name: itemId
+ *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the book for which the comments are being fetched.
+ *         description: The ID of the book or discussion for which the comments are being fetched.
  *     responses:
  *       200:
  *         description: Successfully retrieved the comments
@@ -163,7 +171,7 @@ router.get("/", getComments);
  * /api/v1/comments/{commentId}:
  *   delete:
  *     summary: Delete the comment
- *     description: This endpoint removes the coment by a specific comment ID if it was created by the same user as a user from the request.
+ *     description: This endpoint removes the comment by a specific comment ID if it was created by the same user as a user from the request.
  *     parameters:
  *       - in: path
  *         name: commentId
