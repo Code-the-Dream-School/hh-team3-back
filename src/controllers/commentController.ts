@@ -7,8 +7,9 @@ import {
 import { commentJoiSchema, commentsQuerySchema } from "../validations/commentValidation";
 import { IUser } from "../interfaces/userInterfaces";
 import { StatusCodes } from "http-status-codes";
-import Comment, { IComment } from "../models/Comment";
-import { bookIdSchema } from "../validations/bookValidation";
+import Comment from "../models/Comment";
+import { IComment } from "../interfaces/commentInterfaces";
+import mongoose, { Types, ObjectId } from "mongoose";
 
 export const createCommentToBook = async (
   req: Request<{}, {}, IComment>,
@@ -27,7 +28,7 @@ export const createCommentToBook = async (
 
   try {
     req.body.user = user.userId;
-    req.body.likeCount = 0;
+    // req.body.likeCount = user.userId;
 
     const comment = await Comment.create(req.body);
     res.status(StatusCodes.CREATED).json({ comment });
@@ -84,7 +85,7 @@ export const deleteCommentToBook = async (
   if (user.userId == comment.user) {
     await Comment.findByIdAndDelete(commentId);
   } else {
-    return next (new UnauthenticatedError("User is not authorized to delete this comment"));
+    return next(new UnauthenticatedError("User is not authorized to delete this comment"));
   }
 
   try {
@@ -102,14 +103,28 @@ export const likeCommentToBook = async (
 
   const { commentId } = req.params;
 
-  let udpatedComment = await Comment.findByIdAndUpdate(commentId, { $inc: { likeCount: 1 } }, { new: true, runValidators: true });
+  const userId = req.user.userId;
 
-  if (!udpatedComment) {
-    return next(new NotFoundError("Comment was not found."));
+  if (!userId) {
+    return next(new UnauthenticatedError("User not authenticated"));
   }
 
+  const comment = await Comment.findById(commentId);
+  if (!comment) {
+    return next(new NotFoundError("Comment not found"));
+  }
+
+  const isLiked = comment.likes.some(like => like.toString() === userId);
+
   try {
-    res.status(StatusCodes.OK).json({ "commentId": udpatedComment._id, "likeCount": udpatedComment.likeCount });
+    if (isLiked) {
+      res.status(StatusCodes.BAD_REQUEST).json({ message: "You've already liked this comment" });
+    } else {
+      comment.likes.push(userId);
+      comment.likeCount = comment.likes.length;
+      await comment.save();
+      res.status(StatusCodes.OK).json({ comment });
+    }
   } catch (error) {
     return next(error);
   }
