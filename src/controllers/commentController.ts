@@ -127,14 +127,12 @@ export const likeCommentToBook = async (
       comment.likes = comment.likes.filter(
         (like) => like.toString() !== user.userId.toString()
       );
-      comment.likeCount = comment.likes.length;
       await comment.save();
       res
         .status(StatusCodes.OK)
         .json({ message: "Your like has been removed!" });
     } else {
       comment.likes.push(user.userId);
-      comment.likeCount = comment.likes.length;
       await comment.save();
       res.status(StatusCodes.OK).json({ message: "You liked the comment!" });
     }

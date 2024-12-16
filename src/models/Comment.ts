@@ -47,5 +47,10 @@ const commentSchema = new Schema<IComment>(
   }
 );
 
+commentSchema.pre("save", function (next) {
+  this.likeCount = this.likes.length;
+  next();
+});
+
 const Comment = mongoose.model<IComment>("Comment", commentSchema);
 export default Comment;
