@@ -4,11 +4,12 @@ import {
   NotFoundError,
   UnauthenticatedError,
 } from "../errors";
+
 import { commentIdSchema, commentJoiSchema, commentsQuerySchema } from "../validations/commentValidation";
-import { IUser } from "../interfaces/userInterfaces";
 import { StatusCodes } from "http-status-codes";
-import Comment from "../models/Comment";
-import { IComment } from "../interfaces/commentInterfaces";
+import Comment, { IComment } from "../models/Comment";
+import { bookIdSchema } from "../validations/bookValidation";
+import { IUser } from "../models/User";
 
 export const createCommentToBook = async (
   req: Request<{}, {}, IComment>,

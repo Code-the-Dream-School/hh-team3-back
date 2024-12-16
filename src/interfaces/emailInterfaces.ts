@@ -2,8 +2,8 @@
 export interface SendEmailParams {
   toEmail: string;
   subject: string;
-  textContent: string;
-  htmlContent: string;
+  textContent?: string;
+  htmlContent?: string;
 }
 
 export interface IClientParams {
