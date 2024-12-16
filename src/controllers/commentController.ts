@@ -4,7 +4,7 @@ import {
   NotFoundError,
   UnauthenticatedError,
 } from "../errors";
-import { commentJoiSchema, commentsQuerySchema } from "../validations/commentValidation";
+import { commentIdSchema, commentJoiSchema, commentsQuerySchema } from "../validations/commentValidation";
 import { IUser } from "../interfaces/userInterfaces";
 import { StatusCodes } from "http-status-codes";
 import Comment from "../models/Comment";
@@ -68,6 +68,11 @@ export const deleteCommentToBook = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { error } = commentIdSchema.validate(req.params.commentId);
+  if (error) {
+    return next(new BadRequestError(error.details[0].message));
+  }
+
   const { commentId } = req.params;
 
   const user: IUser | undefined = req.user;
@@ -84,11 +89,15 @@ export const deleteCommentToBook = async (
   if (user.userId == comment.user) {
     await Comment.findByIdAndDelete(commentId);
   } else {
-    return next(new UnauthenticatedError("User is not authorized to delete this comment"));
+    return next(
+      new UnauthenticatedError("User is not authorized to delete this comment")
+    );
   }
 
   try {
-    res.status(StatusCodes.OK).json({ message: "Comment was successfully deleted" });
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Comment was successfully deleted" });
   } catch (error) {
     return next(error);
   }
@@ -99,7 +108,11 @@ export const likeCommentToBook = async (
   res: Response,
   next: NextFunction
 ) => {
-
+  const { error } = commentIdSchema.validate(req.params.commentId);
+  if (error) {
+    return next(new BadRequestError(error.details[0].message));
+  }
+  
   const { commentId } = req.params;
 
   const userId = req.user.userId;
@@ -113,14 +126,18 @@ export const likeCommentToBook = async (
     return next(new NotFoundError("Comment not found"));
   }
 
-  const isLiked = comment.likes.some(like => like.toString() === userId);
+  const isLiked = comment.likes.some((like) => like.toString() === userId);
 
   try {
     if (isLiked) {
-      comment.likes = comment.likes.filter(like => like.toString() !== userId);
+      comment.likes = comment.likes.filter(
+        (like) => like.toString() !== userId
+      );
       comment.likeCount = comment.likes.length;
       await comment.save();
-      res.status(StatusCodes.OK).json({ message: "Your like has been removed!" });
+      res
+        .status(StatusCodes.OK)
+        .json({ message: "Your like has been removed!" });
     } else {
       comment.likes.push(userId);
       comment.likeCount = comment.likes.length;

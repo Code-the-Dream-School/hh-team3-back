@@ -182,6 +182,16 @@ router.get("/", getComments);
  *                 message:
  *                   type: string
  *                   example: "Comment was successfully deleted"
+ *       400:
+ *         description: Bad Request, invalid commentId.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid comment ID format" 
  *       401:
  *         description: User requested the deletion is not the user created the comment
  *         content:
@@ -222,41 +232,19 @@ router.delete("/:commentId", authenticateJWT, deleteCommentToBook);
  * @swagger
  * /api/v1/comments/{commentId}/like:
  *   post:
- *     summary: Adds like to a comment
- *     description: This endpoint incements the likeCount of the comment by 1 by a specific comment ID.
+ *     summary: Adds or removes a like from a comment
+ *     description: This endpoint allows a user to like or unlike a specific comment by commentId. 
+ *       If the user has already liked the comment, it will remove the like. Otherwise, it will add the like.
  *     parameters:
  *       - in: path
  *         name: commentId
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the comment user wants to like.
+ *         description: The ID of the comment the user wants to like or unlike.
  *     responses:
  *       200:
- *         description: Comment was successfully liked
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 commentId:
- *                   type: string
- *                   description: Comment id.
- *                 likeCount:
- *                   type: number
- *                   description: The total number of likes.
- *       404:
- *         description: Comment was not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Comment was not found."
- *       500:
- *         description: Internal server error
+ *         description: The like status has been updated successfully.
  *         content:
  *           application/json:
  *             schema:
@@ -264,10 +252,51 @@ router.delete("/:commentId", authenticateJWT, deleteCommentToBook);
  *               properties:
  *                 message:
  *                   type: string
+ *                   description: A message indicating whether the like was added or removed.
+ *       400:
+ *         description: Bad Request, invalid commentId.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid comment ID format" 
+ *       401:
+ *         description: Unauthorized. The user is not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "User not authenticated"
+ *       404:
+ *         description: The comment was not found in the database.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Comment not found"
+ *       500:
+ *         description: Internal server error, something went wrong.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
  *                   example: "Something went wrong"
  *     tags:
  *       - Comments
  */
+
 router.post("/:commentId/like", authenticateJWT, likeCommentToBook);
 
 
