@@ -4,11 +4,13 @@ import {
   NotFoundError,
   UnauthenticatedError,
 } from "../errors";
-
-import { commentIdSchema, commentJoiSchema, commentsQuerySchema } from "../validations/commentValidation";
+import {
+  commentIdSchema,
+  commentJoiSchema,
+  commentsQuerySchema,
+} from "../validations/commentValidation";
 import { StatusCodes } from "http-status-codes";
 import Comment, { IComment } from "../models/Comment";
-import { bookIdSchema } from "../validations/bookValidation";
 import { IUser } from "../models/User";
 
 export const createCommentToBook = async (
@@ -32,7 +34,6 @@ export const createCommentToBook = async (
 
     const comment = await Comment.create(req.body);
     res.status(StatusCodes.CREATED).json({ comment });
-
   } catch (error) {
     return next(error);
   }
@@ -113,26 +114,25 @@ export const likeCommentToBook = async (
   if (error) {
     return next(new BadRequestError(error.details[0].message));
   }
-  
+
   const { commentId } = req.params;
 
-  const userId = req.user.userId;
-
-  if (!userId) {
-    return next(new UnauthenticatedError("User not authenticated"));
-  }
+ const user: IUser | undefined = req.user;
+ if (!user) {
+   return next(new UnauthenticatedError("User is not authenticated"));
+ }
 
   const comment = await Comment.findById(commentId);
   if (!comment) {
     return next(new NotFoundError("Comment not found"));
   }
 
-  const isLiked = comment.likes.some((like) => like.toString() === userId);
+  const isLiked = comment.likes.some((like) => like.toString() === user.userId.toString())
 
   try {
     if (isLiked) {
       comment.likes = comment.likes.filter(
-        (like) => like.toString() !== userId
+        (like) => like.toString() !== user.userId.toString()
       );
       comment.likeCount = comment.likes.length;
       await comment.save();
@@ -140,7 +140,7 @@ export const likeCommentToBook = async (
         .status(StatusCodes.OK)
         .json({ message: "Your like has been removed!" });
     } else {
-      comment.likes.push(userId);
+      comment.likes.push(user.userId);
       comment.likeCount = comment.likes.length;
       await comment.save();
       res.status(StatusCodes.OK).json({ message: "You liked the comment!" });

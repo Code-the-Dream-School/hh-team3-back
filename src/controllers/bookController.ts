@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError, NotFoundError } from "../errors";
 import { bookJoiSchema } from "../validations/bookValidation";
-import { IBook, IGetBooksQuery } from "../interfaces/bookInterfaces";
-import Book from "../models/Book";
+import {IGetBooksQuery } from "../interfaces/bookInterfaces";
+import Book, { IBook } from "../models/Book";
 
 
 // Get all books

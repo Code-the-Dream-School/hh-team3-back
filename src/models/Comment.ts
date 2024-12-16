@@ -1,5 +1,12 @@
 import mongoose, { Schema } from "mongoose";
-import { IComment } from "../interfaces/commentInterfaces";
+
+export interface IComment extends Document {
+  user: Schema.Types.ObjectId;
+  book: Schema.Types.ObjectId;
+  text: string;
+  likes: Schema.Types.ObjectId[];
+  likeCount: number;
+}
 
 const commentSchema = new Schema<IComment>(
   {
