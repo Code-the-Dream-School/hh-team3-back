@@ -76,8 +76,6 @@ const getUserProfile = async (
   try {
     
     const email = req.query.email as string;
-    console.log("Query email:", email);
-    console.log("Query email type:", typeof(email));
     
     let userProfile;
     

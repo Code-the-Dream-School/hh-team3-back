@@ -1,13 +1,7 @@
-import mongoose, { Schema, Document, ObjectId } from "mongoose";
+import mongoose, { Schema } from "mongoose";
+import { IComment } from "../interfaces/commentInterfaces";
 
-export interface IComment extends Document {
-  user: ObjectId;
-  book: ObjectId;
-  text: string;
-  likeCount: number;
-}
-
-const commentSchema = new Schema(
+const commentSchema = new Schema<IComment>(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -23,10 +17,15 @@ const commentSchema = new Schema(
       type: String,
       required: true,
     },
+    likes: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: [],
+    },
     likeCount: {
       type: Number,
       default: 0,
-    },
+    }
   },
   {
     timestamps: true,
