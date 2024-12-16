@@ -10,8 +10,8 @@ import {
   discussionJoiSchema,
   discussionIdSchema,
 } from "../validations/discussionValidation";
-import { IDiscussion, IGetDiscussionsQuery, IJoinDiscussionBody } from "../interfaces/discussionInterfaces";
-import Discussion from "../models/Discussion";
+import {IGetDiscussionsQuery, IJoinDiscussionBody } from "../interfaces/discussionInterfaces";
+import Discussion, { IDiscussion } from "../models/Discussion";
 import { IUser } from "../models/User";
 import { sendEmail } from "../services/mailjetService";
 import User from "../models/User";
