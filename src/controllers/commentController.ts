@@ -9,7 +9,6 @@ import { IUser } from "../interfaces/userInterfaces";
 import { StatusCodes } from "http-status-codes";
 import Comment from "../models/Comment";
 import { IComment } from "../interfaces/commentInterfaces";
-import mongoose, { Types, ObjectId } from "mongoose";
 
 export const createCommentToBook = async (
   req: Request<{}, {}, IComment>,
