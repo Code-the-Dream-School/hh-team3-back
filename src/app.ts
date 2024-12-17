@@ -7,6 +7,7 @@ import logger from "morgan";
 import mainRouter from "./routes/mainRouter";
 import booksRouter from "./routes/bookRoutes";
 import commentRouter from "./routes/commentRoutes";
+import photoRouter from "./routes/photoRoutes";
 import discussionsRouter from "./routes/discussionRoutes";
 import authRouter from "./routes/userRoutes";
 import emailRouter from "./routes/emailRoutes";
@@ -48,6 +49,7 @@ app.use("/api/v1/books", booksRouter);
 app.use("/api/v1/comments", commentRouter); 
 app.use("/api/v1/discussions", discussionsRouter); 
 app.use("/api/v1/email", emailRouter);
+app.use("/api/v1/photo", photoRouter);
 
 
 app.use((req: Request, res: Response) => {

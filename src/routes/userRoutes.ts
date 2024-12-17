@@ -27,6 +27,9 @@ const router: Router = express.Router();
  *         password:
  *            type: string
  *            example: password123
+ *         photo:
+ *            type: string
+ *            example: https://example.com/uploaded-photo.jpg
  *         role:
  *           type: string
  *           description: User's role (either 'user' or 'admin')
@@ -58,7 +61,18 @@ const router: Router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: "jane5"
+ *                 token:
+ *                   type: string
+ *                   example: "token"
+ *
  *       400:
  *         description: Bad request, missing fields
  *       401:

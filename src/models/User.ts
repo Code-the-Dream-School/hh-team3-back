@@ -7,6 +7,8 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  photo: string;
+  photoId: string;
   role: "user" | "admin";
   passwordResetToken?: string;
   createJWT(): string;
@@ -33,6 +35,12 @@ const UserSchema = new Schema<IUser>({
     type: String,
     required: [true, "Please provide password"],
     minlength: 6,
+  },
+  photo: {
+    type: String,
+  },
+  photoId: {
+    type: String,
   },
   role: {
     type: String,
