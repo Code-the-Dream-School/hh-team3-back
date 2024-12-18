@@ -1,15 +1,18 @@
 import { UploadedFile } from "express-fileupload";
 import cloudinary from "../config/cloudinaryConfig";
 
-const uploadPhoto = async (file: Express.Multer.File) => {
+const uploadPhoto = async (
+  file: Express.Multer.File,
+  folder: "avatars" | "covers"
+) => {
   try {
     if (!file.buffer) {
       throw new Error("No file buffer available");
     }
 
-   const uploadResult = await new Promise<any>((resolve, reject) => {
+    const uploadResult = await new Promise<any>((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
-        { public_id: `avatar_${Date.now()}`, folder: "avatars" },
+        { public_id: `avatar_${Date.now()}`, folder: folder},
         (error, result) => {
           if (error) {
             return reject(error);
@@ -21,7 +24,7 @@ const uploadPhoto = async (file: Express.Multer.File) => {
       stream.end(file.buffer);
     });
 
-   const optimizeUrl = cloudinary.url(uploadResult.public_id, {
+    const optimizeUrl = cloudinary.url(uploadResult.public_id, {
       fetch_format: "auto",
       quality: "auto",
     });

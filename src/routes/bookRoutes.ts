@@ -6,6 +6,7 @@ import {
   deleteBook,
   getAllCategories,
 } from "../controllers/bookController";
+import authenticateJWT from "../middleware/authentication";
 
 // Create a router instance
 const router = Router();
@@ -181,7 +182,7 @@ router.get("/categories", getAllCategories);
  *       500:
  *         description: Internal server error
  */
-router.post("/", createBook);
+router.post("/", authenticateJWT, createBook);
 
 // Get a single book by ID
 /**
@@ -237,7 +238,7 @@ router.get("/:bookId", getBook);
  *       500:
  *         description: Internal server error
  */
-router.delete("/:bookId", deleteBook);
+router.delete("/:bookId",authenticateJWT, deleteBook);
 
 
 export default router;
