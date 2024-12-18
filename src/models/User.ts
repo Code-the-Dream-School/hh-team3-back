@@ -38,9 +38,11 @@ const UserSchema = new Schema<IUser>({
   },
   photo: {
     type: String,
+    default: "",
   },
   photoId: {
     type: String,
+    default: "",
   },
   role: {
     type: String,

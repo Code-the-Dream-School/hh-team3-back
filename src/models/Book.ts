@@ -55,14 +55,17 @@ const bookSchema = new Schema(
       bookCoverId: {
         type: String,
         required: false,
+        default: "",
       },
       smallThumbnail: {
         type: String,
         required: false,
+        default: "",
       },
       thumbnail: {
         type: String,
         required: false,
+        default: "",
       },
     },
   },
