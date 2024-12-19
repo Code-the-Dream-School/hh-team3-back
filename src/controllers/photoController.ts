@@ -22,7 +22,11 @@ export const uploadUserAvatarController = async (
 
     const { uploadResult, optimizeUrl, autoCropUrl } = await uploadPhoto(
       req.file,
-      "avatars"
+      {
+        folder: "avatars",
+        width: 150,
+        height: 150,
+      }
     );
 
     const userProfile = await User.findOne({ _id: user.userId });
@@ -74,7 +78,11 @@ export const uploadBookCoverController = async (
 
     const { uploadResult, optimizeUrl, autoCropUrl } = await uploadPhoto(
       req.file,
-      "covers"
+      {
+        folder: "covers",
+        width: 1200,
+        height: 1800,
+      }
     );
 
     const book = await Book.findById(bookId);
