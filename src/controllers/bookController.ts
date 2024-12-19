@@ -119,7 +119,9 @@ const deleteBook = async (
     if (!book) {
       throw new NotFoundError(`No book with id ${bookId}`);
     }
-    res.status(StatusCodes.OK).send();
+     res
+       .status(StatusCodes.OK)
+       .json({ message: "Book was successfully deleted" });
   } catch (error: unknown) {
     return next(error);
   }

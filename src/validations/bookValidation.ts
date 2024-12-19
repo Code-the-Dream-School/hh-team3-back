@@ -11,6 +11,7 @@ export const bookJoiSchema = Joi.object({
   publishedDate: Joi.date().iso().required(),
   categories: Joi.array().items(Joi.string().required()),
   imageLinks: Joi.object({
+    bookCoverId: Joi.string().optional(),
     smallThumbnail: Joi.string().uri().optional(),
     thumbnail: Joi.string().uri().optional(),
   }).optional(),

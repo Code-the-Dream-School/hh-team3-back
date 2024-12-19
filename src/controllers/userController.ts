@@ -96,6 +96,7 @@ const getUserProfile = async (
         name: userProfile.name,
         email: userProfile.email,
         id: userProfile._id,
+        photo: userProfile.photo,
         role: userProfile.role,
       });
   } catch (error) {
