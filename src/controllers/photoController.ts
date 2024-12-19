@@ -35,7 +35,7 @@ export const uploadUserAvatarController = async (
     userProfile.photo = autoCropUrl;
     await userProfile.save();
 
-    res.json({
+    res.status(200).json({
       message: "Avatar uploaded successfully!",
       imageUrl: uploadResult.secure_url,
       optimizedUrl: optimizeUrl,
@@ -119,7 +119,7 @@ export const deleteAvatarController = async (
     }
 
     if (!userProfile.photoId) {
-      return next(new NotFoundError("No photo to delete"));
+      return next(new BadRequestError("No photo to delete"));
     }
 
     const deleteResult = await deletePhoto(userProfile.photoId);
@@ -128,7 +128,7 @@ export const deleteAvatarController = async (
       userProfile.photoId = "";
       await userProfile.save();
 
-      res.json({
+      res.status(200).json({
         message: "Photo deleted successfully!",
       });
     } else {

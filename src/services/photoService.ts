@@ -38,6 +38,7 @@ const uploadPhoto = async (
 
     return { uploadResult, optimizeUrl, autoCropUrl };
   } catch (error) {
+    console.error("Error uploading image:", error);
     throw new Error(`Error uploading image`);
   }
 };
@@ -47,12 +48,7 @@ const deletePhoto = async (
 ): Promise<{ success: boolean }> => {
   try {
     const result = await cloudinary.uploader.destroy(publicId);
-
-    if (result.result === "ok") {
-      return { success: true };
-    } else {
-      return { success: false };
-    }
+    return { success: result.result == "ok" };
   } catch (error) {
     console.error("Error deleting from Cloudinary:", error);
     return { success: false };
