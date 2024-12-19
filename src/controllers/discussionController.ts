@@ -150,7 +150,9 @@ const deleteDiscussion = async (
 
   try {
     await discussion.deleteOne();
-    res.status(StatusCodes.OK).send();
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Discussion was successfully deleted" });
   } catch (error) {
     return next(error);
   }

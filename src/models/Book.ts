@@ -10,6 +10,7 @@ export interface IBook extends Document {
   publishedDate: Date;
   categories: string[];
   imageLinks: {
+    bookCoverId: string;
     smallThumbnail: string;
     thumbnail: string;
   };
@@ -51,13 +52,20 @@ const bookSchema = new Schema(
       required: true,
     },
     imageLinks: {
+      bookCoverId: {
+        type: String,
+        required: false,
+        default: "",
+      },
       smallThumbnail: {
         type: String,
         required: false,
+        default: "",
       },
       thumbnail: {
         type: String,
         required: false,
+        default: "",
       },
     },
   },
