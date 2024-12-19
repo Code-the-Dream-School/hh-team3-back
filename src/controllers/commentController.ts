@@ -30,8 +30,6 @@ export const createCommentToBook = async (
 
   try {
     req.body.user = user.userId;
-    // req.body.likeCount = user.userId;
-
     const comment = await Comment.create(req.body);
     res.status(StatusCodes.CREATED).json({ comment });
   } catch (error) {
@@ -40,7 +38,7 @@ export const createCommentToBook = async (
 };
 
 export const getComments = async (
-  req: Request<{}, {}, {}, { bookId?: string }>,
+  req: Request<{}, {}, {}, { itemId?: string }>,
   res: Response,
   next: NextFunction
 ) => {
@@ -49,16 +47,11 @@ export const getComments = async (
     return next(new BadRequestError(error.details[0].message));
   }
 
-  const { bookId } = req.query;
-
-  let query: any = {};
-
-  if (bookId) {
-    query.book = bookId;
-  }
-
+  const { itemId } = req.query;
   try {
-    const comments = await Comment.find(query).sort({ createdAt: -1 });
+   const comments = await Comment.find({
+     $or: [{ book: itemId }, { discussion: itemId }],
+   }).sort({ createdAt: -1 });
     res.status(StatusCodes.OK).json({ comments, count: comments.length });
   } catch (error) {
     return next(error);
@@ -66,7 +59,7 @@ export const getComments = async (
 };
 
 export const deleteCommentToBook = async (
-  req: Request<{ commentId: string }, {}, {}, { bookId?: string }>,
+  req: Request<{ commentId: string }>,
   res: Response,
   next: NextFunction
 ) => {
@@ -134,14 +127,12 @@ export const likeCommentToBook = async (
       comment.likes = comment.likes.filter(
         (like) => like.toString() !== user.userId.toString()
       );
-      comment.likeCount = comment.likes.length;
       await comment.save();
       res
         .status(StatusCodes.OK)
         .json({ message: "Your like has been removed!" });
     } else {
       comment.likes.push(user.userId);
-      comment.likeCount = comment.likes.length;
       await comment.save();
       res.status(StatusCodes.OK).json({ message: "You liked the comment!" });
     }
