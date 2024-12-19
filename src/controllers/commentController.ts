@@ -11,7 +11,7 @@ import {
 } from "../validations/commentValidation";
 import { StatusCodes } from "http-status-codes";
 import Comment, { IComment } from "../models/Comment";
-import { IUser } from "../models/User";
+import User, { IUser } from "../models/User";
 
 export const createCommentToBook = async (
   req: Request<{}, {}, IComment>,
@@ -81,14 +81,19 @@ export const deleteCommentToBook = async (
     return next(new NotFoundError("Comment was not found."));
   }
 
-  if (user.userId == comment.user) {
-    await Comment.findByIdAndDelete(commentId);
-  } else {
-    return next(
-      new UnauthenticatedError("User is not authorized to delete this comment")
-    );
-  }
-
+   if (user.userId != comment.user) {
+     const db_user = await User.findOne({ _id: user.userId });
+     if (!db_user || db_user.role != "admin") {
+       return next(
+         new UnauthenticatedError(
+           "User is not authorized to delete this comment"
+         )
+       );
+     }
+   }
+  
+   await Comment.findByIdAndDelete(commentId);
+  
   try {
     res
       .status(StatusCodes.OK)
