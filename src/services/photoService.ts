@@ -1,26 +1,29 @@
-import { UploadedFile } from "express-fileupload";
 import cloudinary from "../config/cloudinaryConfig";
+import {
+  UploadOptions,
+  UploadResult,
+  UploadResponse,
+} from "../interfaces/photoInterfaces";
 
 const uploadPhoto = async (
   file: Express.Multer.File,
-  folder: "avatars" | "covers"
+  { folder, width, height }: UploadOptions
 ) => {
   try {
     if (!file.buffer) {
       throw new Error("No file buffer available");
     }
 
-    const uploadResult = await new Promise<any>((resolve, reject) => {
+    const uploadResult = await new Promise<UploadResult>((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
-        { public_id: `avatar_${Date.now()}`, folder: folder},
+        { public_id: `avatar_${Date.now()}`, folder: folder },
         (error, result) => {
           if (error) {
             return reject(error);
           }
-          resolve(result);
+          resolve(result as UploadResult);
         }
       );
-
       stream.end(file.buffer);
     });
 
@@ -32,8 +35,8 @@ const uploadPhoto = async (
     const autoCropUrl = cloudinary.url(uploadResult.public_id, {
       crop: "auto",
       gravity: "auto",
-      width: 500,
-      height: 500,
+      width: width,
+      height: height,
     });
 
     return { uploadResult, optimizeUrl, autoCropUrl };

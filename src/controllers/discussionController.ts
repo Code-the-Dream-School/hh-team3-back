@@ -137,16 +137,19 @@ const deleteDiscussion = async (
      return next(new NotFoundError(`No discussion with id ${discussionId}`));
    }
 
-   if (
-     discussion.createdBy &&
-     user.userId.toString() !== discussion.createdBy.toString()
-   ) {
-     return next(
-       new UnauthenticatedError(
-         "You are not authorized to delete this discussion"
-       )
-     );
-   }
+    if (
+      discussion.createdBy &&
+      user.userId.toString() !== discussion.createdBy.toString()
+    ) {
+      const db_user = await User.findOne({ _id: user.userId });
+      if (!db_user || db_user.role != "admin") {
+        return next(
+          new UnauthenticatedError(
+            "You are not authorized to update this discussion"
+          )
+        );
+      }
+    }
 
   try {
     await discussion.deleteOne();
@@ -188,11 +191,14 @@ const updateDiscussion = async (
      discussion.createdBy &&
      user.userId.toString() !== discussion.createdBy.toString()
    ) {
-     return next(
-       new UnauthenticatedError(
-         "You are not authorized to update this discussion"
-       )
-     );
+     const db_user = await User.findOne({ _id: user.userId });
+     if (!db_user || db_user.role != "admin") {
+       return next(
+         new UnauthenticatedError(
+           "You are not authorized to update this discussion"
+         )
+       );
+     }
    }
 
     if (req.body.title) discussion.title = req.body.title;
