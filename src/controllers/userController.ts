@@ -70,25 +70,30 @@ const getUserProfile = async (
   
   const user = req.user as IUser | undefined;
 
-  if (!user) {
-    return next(new UnauthenticatedError("User is not authenticated"));
-  }
-
   try {
     
     const email = req.query.email as string;
     const id = req.query.id as string;
     
     let userProfile;
-    
+
     if (id) {
       userProfile = await User.findOne({ _id: id });
-    } else if (email) {
+    }
+    else if (email) {
       userProfile = await User.findOne({ email: email });
-    } else {
+    }
+    else if (user) {
       userProfile = await User.findOne({ _id: user.userId });
     }
-        
+    else {
+      return next(
+        new BadRequestError(
+          "You must provide either an email, id, or be authenticated"
+        )
+      );
+    }
+
     if (!userProfile) {
       return next(new NotFoundError("The user was not found"));
     }
