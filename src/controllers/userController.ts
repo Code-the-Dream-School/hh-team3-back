@@ -67,7 +67,8 @@ const getUserProfile = async (
   next: NextFunction
 ): Promise<void> => {
 
-  const user: IUser | undefined = req.user;
+  
+  const user = req.user as IUser | undefined;
 
   if (!user) {
     return next(new UnauthenticatedError("User is not authenticated"));
@@ -76,13 +77,16 @@ const getUserProfile = async (
   try {
     
     const email = req.query.email as string;
+    const id = req.query.id as string;
     
     let userProfile;
     
-    if (email) {      
-      userProfile = await User.findOne({ "email": email });
+    if (id) {
+      userProfile = await User.findOne({ _id: id });
+    } else if (email) {
+      userProfile = await User.findOne({ email: email });
     } else {
-      userProfile = await User.findOne({ "_id": user.userId });
+      userProfile = await User.findOne({ _id: user.userId });
     }
         
     if (!userProfile) {
@@ -117,7 +121,7 @@ const updateUserProfile = async (
 
   const { name, email, role } = req.body;
 
-  const user: IUser | undefined = req.user;
+  const user = req.user as IUser | undefined;
 
   if (!user) {
     return next(new UnauthenticatedError("User is not authenticated"));
