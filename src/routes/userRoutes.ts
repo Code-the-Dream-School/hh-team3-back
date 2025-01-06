@@ -128,7 +128,7 @@ const router: Router = express.Router();
  * @swagger
  * /api/v1/auth/profile:
  *   get:
- *     summary: Get the profile of the existing user
+ *     summary: Get the profile of an authenticated user or a user based on email or ID
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: token 
@@ -140,19 +140,26 @@ const router: Router = express.Router();
  *         schema:
  *           type: string
  *           example: john@gmail.com
+ *       - name: id
+ *         in: query
+ *         description: The ID of the user to retrieve (optional if authenticated).
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: 605c72ef1532072b1c4e2e62
  *     responses:
  *       200:
  *         description: Profile has been found
  *         content:
  *           application/json:
-  *             schema:
+ *             schema:
  *               $ref: '#/components/schemas/User'
  *       400:
- *         description: Bad request, missing email field
+ *         description: Bad request, missing query parameters or invalid data
  *       401:
- *         description: Unauthorized, user is not authorized
+ *         description: Unauthorized, user is not authenticated or token is invalid
  *       404:
- *         description: User profile not found
+ *         description: User profile not found for the given email or ID
  *       500:
  *         description: Internal server error
  */
