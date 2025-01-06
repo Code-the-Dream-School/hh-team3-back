@@ -167,39 +167,53 @@ const router: Router = express.Router();
 /**
  * @swagger
  * /api/v1/auth/profile:
- *   post:
- *     summary: Update profile an existing user
+ *   get:
+ *     summary: Get the profile of the authenticated user
  *     tags: [Auth]
  *     security:
- *       - bearerAuth: token 
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name: 
- *                 type: string
- *                 example: john
- *               email: 
- *                 type: string
- *                 example: john@gmail.com
+ *       - bearerAuth: []  # Ensures this route requires authentication
  *     responses:
  *       200:
- *         description: User logged in successfully
+ *         description: Profile of the authenticated user
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "User has been updated"
- *       400:
- *         description: Bad request, missing fields
+ *               $ref: '#/components/schemas/User'
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized, user is not authenticated or token is invalid
+ *       500:
+ *         description: Internal server error
+ * 
+ * /api/v1/auth/profile/public:
+ *   get:
+ *     summary: Get the profile of a user based on email or ID (public)
+ *     tags: [Auth]
+ *     parameters:
+ *       - name: email
+ *         in: query
+ *         description: The email address of the user to retrieve (optional if authenticated).
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: john@gmail.com
+ *       - name: id
+ *         in: query
+ *         description: The ID of the user to retrieve (optional if authenticated).
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: 605c72ef1532072b1c4e2e62
+ *     responses:
+ *       200:
+ *         description: Profile found based on email or ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Bad request, missing query parameters or invalid data
+ *       404:
+ *         description: User profile not found for the given email or ID
  *       500:
  *         description: Internal server error
  */
@@ -356,6 +370,7 @@ router.post("/reset", resetPassword);
 
 //Get user profile route
 router.get("/profile", authenticateJWT, getUserProfile);
+router.get("/profile/public", getUserProfile);
 
 //Update user profile route
 router.post("/profile/", authenticateJWT, updateUserProfile);
